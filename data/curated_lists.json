@@ -1,0 +1,885 @@
+{
+  "schemaVersion": 1,
+  "lists": [
+    {
+      "id": "batailles_decisives",
+      "name": "Batailles décisives",
+      "icon": "⚔️",
+      "category": "Histoire",
+      "columns": [
+        "Numéro",
+        "Image",
+        "Bataille",
+        "Date",
+        "Lieu",
+        "Issue"
+      ],
+      "rows": [
+        [
+          "1",
+          "thumbs/batailles_decisives/1.webp",
+          "Marathon",
+          "490 av. J.-C.",
+          "Grèce",
+          "Victoire athénienne"
+        ],
+        [
+          "2",
+          "thumbs/batailles_decisives/2.webp",
+          "Hastings",
+          "1066",
+          "Angleterre",
+          "Conquête normande"
+        ],
+        [
+          "3",
+          "thumbs/batailles_decisives/3.webp",
+          "Bouvines",
+          "1214",
+          "France",
+          "Victoire capétienne"
+        ],
+        [
+          "4",
+          "thumbs/batailles_decisives/4.webp",
+          "Waterloo",
+          "1815",
+          "Belgique",
+          "Fin de Napoléon"
+        ],
+        [
+          "5",
+          "thumbs/batailles_decisives/5.webp",
+          "Verdun",
+          "1916",
+          "France",
+          "Guerre d’usure"
+        ],
+        [
+          "6",
+          "thumbs/batailles_decisives/6.webp",
+          "Stalingrad",
+          "1942-1943",
+          "URSS",
+          "Tournant du front Est"
+        ],
+        [
+          "7",
+          "thumbs/batailles_decisives/7.webp",
+          "Midway",
+          "1942",
+          "Pacifique",
+          "Tournant naval"
+        ],
+        [
+          "8",
+          "thumbs/batailles_decisives/8.webp",
+          "Diên Biên Phu",
+          "1954",
+          "Vietnam",
+          "Fin de l’Indochine française"
+        ]
+      ]
+    },
+    {
+      "id": "grandes_explorations",
+      "name": "Grandes explorations",
+      "icon": "🧭",
+      "category": "Histoire",
+      "columns": [
+        "Numéro",
+        "Image",
+        "Explorateur",
+        "Période",
+        "Espace",
+        "Repère"
+      ],
+      "rows": [
+        [
+          "1",
+          "thumbs/grandes_explorations/1.webp",
+          "Zheng He",
+          "1405-1433",
+          "Océan Indien",
+          "Expéditions chinoises"
+        ],
+        [
+          "2",
+          "thumbs/grandes_explorations/2.webp",
+          "Christophe Colomb",
+          "1492",
+          "Atlantique",
+          "Arrivée aux Amériques"
+        ],
+        [
+          "3",
+          "thumbs/grandes_explorations/3.webp",
+          "Vasco de Gama",
+          "1497-1499",
+          "Route des Indes",
+          "Cap de Bonne-Espérance"
+        ],
+        [
+          "4",
+          "thumbs/grandes_explorations/4.webp",
+          "Magellan et Elcano",
+          "1519-1522",
+          "Monde",
+          "Premier tour du monde"
+        ],
+        [
+          "5",
+          "thumbs/grandes_explorations/5.webp",
+          "James Cook",
+          "1768-1779",
+          "Pacifique",
+          "Cartographie du Pacifique"
+        ],
+        [
+          "6",
+          "thumbs/grandes_explorations/6.webp",
+          "Alexander von Humboldt",
+          "1799-1804",
+          "Amériques",
+          "Exploration scientifique"
+        ],
+        [
+          "7",
+          "thumbs/grandes_explorations/7.webp",
+          "David Livingstone",
+          "1841-1873",
+          "Afrique australe",
+          "Chutes Victoria"
+        ],
+        [
+          "8",
+          "thumbs/grandes_explorations/8.webp",
+          "Roald Amundsen",
+          "1911",
+          "Antarctique",
+          "Pôle Sud"
+        ]
+      ]
+    },
+    {
+      "id": "revolutions",
+      "name": "Révolutions et indépendances",
+      "icon": "✊",
+      "category": "Histoire",
+      "columns": [
+        "Numéro",
+        "Image",
+        "Événement",
+        "Période",
+        "Lieu",
+        "Repère"
+      ],
+      "rows": [
+        [
+          "1",
+          "thumbs/revolutions/1.webp",
+          "Révolution américaine",
+          "1775-1783",
+          "Treize Colonies",
+          "Indépendance des États-Unis"
+        ],
+        [
+          "2",
+          "thumbs/revolutions/2.webp",
+          "Révolution française",
+          "1789-1799",
+          "France",
+          "Fin de l’Ancien Régime"
+        ],
+        [
+          "3",
+          "thumbs/revolutions/3.webp",
+          "Révolution haïtienne",
+          "1791-1804",
+          "Haïti",
+          "Première république noire"
+        ],
+        [
+          "4",
+          "thumbs/revolutions/4.webp",
+          "Révolutions de 1848",
+          "1848",
+          "Europe",
+          "Printemps des peuples"
+        ],
+        [
+          "5",
+          "thumbs/revolutions/5.webp",
+          "Révolution mexicaine",
+          "1910-1920",
+          "Mexique",
+          "Constitution de 1917"
+        ],
+        [
+          "6",
+          "thumbs/revolutions/6.webp",
+          "Révolution russe",
+          "1917",
+          "Russie",
+          "Prise du pouvoir bolchevique"
+        ],
+        [
+          "7",
+          "thumbs/revolutions/7.webp",
+          "Révolution cubaine",
+          "1953-1959",
+          "Cuba",
+          "Arrivée de Castro"
+        ],
+        [
+          "8",
+          "thumbs/revolutions/8.webp",
+          "Révolution de Velours",
+          "1989",
+          "Tchécoslovaquie",
+          "Transition démocratique"
+        ]
+      ]
+    },
+    {
+      "id": "montagnes_monde",
+      "name": "Sommets du monde",
+      "icon": "⛰️",
+      "category": "Géographie",
+      "columns": [
+        "Numéro",
+        "Image",
+        "Sommet",
+        "Altitude",
+        "Massif",
+        "Pays / territoire"
+      ],
+      "rows": [
+        [
+          "1",
+          "thumbs/montagnes_monde/1.webp",
+          "Everest",
+          "8 849 m",
+          "Himalaya",
+          "Népal / Chine"
+        ],
+        [
+          "2",
+          "thumbs/montagnes_monde/2.webp",
+          "K2",
+          "8 611 m",
+          "Karakoram",
+          "Pakistan / Chine"
+        ],
+        [
+          "3",
+          "thumbs/montagnes_monde/3.webp",
+          "Kangchenjunga",
+          "8 586 m",
+          "Himalaya",
+          "Népal / Inde"
+        ],
+        [
+          "4",
+          "thumbs/montagnes_monde/4.webp",
+          "Mont Blanc",
+          "4 808 m",
+          "Alpes",
+          "France / Italie"
+        ],
+        [
+          "5",
+          "thumbs/montagnes_monde/5.webp",
+          "Cervin",
+          "4 478 m",
+          "Alpes",
+          "Suisse / Italie"
+        ],
+        [
+          "6",
+          "thumbs/montagnes_monde/6.webp",
+          "Kilimandjaro",
+          "5 895 m",
+          "Rift est-africain",
+          "Tanzanie"
+        ],
+        [
+          "7",
+          "thumbs/montagnes_monde/7.webp",
+          "Aconcagua",
+          "6 961 m",
+          "Andes",
+          "Argentine"
+        ],
+        [
+          "8",
+          "thumbs/montagnes_monde/8.webp",
+          "Denali",
+          "6 190 m",
+          "Alaska Range",
+          "États-Unis"
+        ]
+      ]
+    },
+    {
+      "id": "mers_oceans",
+      "name": "Mers et océans",
+      "icon": "🌊",
+      "category": "Géographie",
+      "columns": [
+        "Numéro",
+        "Image",
+        "Étendue d’eau",
+        "Superficie",
+        "Bassin",
+        "Repère"
+      ],
+      "rows": [
+        [
+          "1",
+          "thumbs/mers_oceans/1.webp",
+          "Océan Pacifique",
+          "165 millions km²",
+          "Pacifique",
+          "Le plus vaste"
+        ],
+        [
+          "2",
+          "thumbs/mers_oceans/2.webp",
+          "Océan Atlantique",
+          "106 millions km²",
+          "Atlantique",
+          "Entre Amériques et Europe-Afrique"
+        ],
+        [
+          "3",
+          "thumbs/mers_oceans/3.webp",
+          "Océan Indien",
+          "70 millions km²",
+          "Indien",
+          "Entre Afrique, Asie et Australie"
+        ],
+        [
+          "4",
+          "thumbs/mers_oceans/4.webp",
+          "Océan Arctique",
+          "14 millions km²",
+          "Arctique",
+          "Autour du pôle Nord"
+        ],
+        [
+          "5",
+          "thumbs/mers_oceans/5.webp",
+          "Mer Méditerranée",
+          "2,5 millions km²",
+          "Méditerranée",
+          "Entre Europe, Afrique et Asie"
+        ],
+        [
+          "6",
+          "thumbs/mers_oceans/6.webp",
+          "Mer des Caraïbes",
+          "2,75 millions km²",
+          "Atlantique",
+          "Antilles et Amérique centrale"
+        ],
+        [
+          "7",
+          "thumbs/mers_oceans/7.webp",
+          "Mer Rouge",
+          "438 000 km²",
+          "Indien",
+          "Entre Afrique et Arabie"
+        ],
+        [
+          "8",
+          "thumbs/mers_oceans/8.webp",
+          "Mer Baltique",
+          "377 000 km²",
+          "Atlantique",
+          "Europe du Nord"
+        ]
+      ]
+    },
+    {
+      "id": "detroits_monde",
+      "name": "Détroits stratégiques",
+      "icon": "🗺️",
+      "category": "Géographie",
+      "columns": [
+        "Numéro",
+        "Image",
+        "Détroit",
+        "Relie",
+        "Sépare",
+        "Repère"
+      ],
+      "rows": [
+        [
+          "1",
+          "thumbs/detroits_monde/1.webp",
+          "Gibraltar",
+          "Atlantique et Méditerranée",
+          "Europe et Afrique",
+          "Entrée de la Méditerranée"
+        ],
+        [
+          "2",
+          "thumbs/detroits_monde/2.webp",
+          "Bosphore",
+          "Mer Noire et mer de Marmara",
+          "Europe et Asie",
+          "Istanbul"
+        ],
+        [
+          "3",
+          "thumbs/detroits_monde/3.webp",
+          "Dardanelles",
+          "Mer Égée et mer de Marmara",
+          "Europe et Asie",
+          "Accès au Bosphore"
+        ],
+        [
+          "4",
+          "thumbs/detroits_monde/4.webp",
+          "Ormuz",
+          "Golfe Persique et golfe d’Oman",
+          "Iran et Oman",
+          "Route pétrolière"
+        ],
+        [
+          "5",
+          "thumbs/detroits_monde/5.webp",
+          "Malacca",
+          "Océan Indien et mer de Chine",
+          "Malaisie et Sumatra",
+          "Route Asie-Europe"
+        ],
+        [
+          "6",
+          "thumbs/detroits_monde/6.webp",
+          "Béring",
+          "Arctique et Pacifique",
+          "Russie et Alaska",
+          "Entre Asie et Amérique"
+        ],
+        [
+          "7",
+          "thumbs/detroits_monde/7.webp",
+          "Magellan",
+          "Atlantique et Pacifique",
+          "Terre de Feu et continent",
+          "Chili"
+        ],
+        [
+          "8",
+          "thumbs/detroits_monde/8.webp",
+          "Bab-el-Mandeb",
+          "Mer Rouge et golfe d’Aden",
+          "Afrique et Arabie",
+          "Accès à Suez"
+        ]
+      ]
+    },
+    {
+      "id": "parcs_nationaux",
+      "name": "Parcs nationaux emblématiques",
+      "icon": "🌲",
+      "category": "Géographie",
+      "columns": [
+        "Numéro",
+        "Image",
+        "Parc",
+        "Pays",
+        "Création",
+        "Milieu"
+      ],
+      "rows": [
+        [
+          "1",
+          "thumbs/parcs_nationaux/1.webp",
+          "Yellowstone",
+          "États-Unis",
+          "1872",
+          "Geysers et bisons"
+        ],
+        [
+          "2",
+          "thumbs/parcs_nationaux/2.webp",
+          "Yosemite",
+          "États-Unis",
+          "1890",
+          "Granite et séquoias"
+        ],
+        [
+          "3",
+          "thumbs/parcs_nationaux/3.webp",
+          "Banff",
+          "Canada",
+          "1885",
+          "Rocheuses canadiennes"
+        ],
+        [
+          "4",
+          "thumbs/parcs_nationaux/4.webp",
+          "Kruger",
+          "Afrique du Sud",
+          "1926",
+          "Savane"
+        ],
+        [
+          "5",
+          "thumbs/parcs_nationaux/5.webp",
+          "Serengeti",
+          "Tanzanie",
+          "1951",
+          "Grande migration"
+        ],
+        [
+          "6",
+          "thumbs/parcs_nationaux/6.webp",
+          "Torres del Paine",
+          "Chili",
+          "1959",
+          "Patagonie"
+        ],
+        [
+          "7",
+          "thumbs/parcs_nationaux/7.webp",
+          "Fiordland",
+          "Nouvelle-Zélande",
+          "1952",
+          "Fjords"
+        ],
+        [
+          "8",
+          "thumbs/parcs_nationaux/8.webp",
+          "Kakadu",
+          "Australie",
+          "1979",
+          "Zones humides"
+        ]
+      ]
+    },
+    {
+      "id": "architectes_majeurs",
+      "name": "Architectes majeurs",
+      "icon": "🏛️",
+      "category": "Arts & culture",
+      "columns": [
+        "Numéro",
+        "Image",
+        "Architecte",
+        "Période",
+        "Pays",
+        "Œuvre repère"
+      ],
+      "rows": [
+        [
+          "1",
+          "thumbs/architectes_majeurs/1.webp",
+          "Filippo Brunelleschi",
+          "Renaissance",
+          "Italie",
+          "Dôme de Florence"
+        ],
+        [
+          "2",
+          "thumbs/architectes_majeurs/2.webp",
+          "Andrea Palladio",
+          "Renaissance",
+          "Italie",
+          "Villa Rotonda"
+        ],
+        [
+          "3",
+          "thumbs/architectes_majeurs/3.webp",
+          "Antoni Gaudí",
+          "Modernisme",
+          "Espagne",
+          "Sagrada Família"
+        ],
+        [
+          "4",
+          "thumbs/architectes_majeurs/4.webp",
+          "Frank Lloyd Wright",
+          "XXe siècle",
+          "États-Unis",
+          "Fallingwater"
+        ],
+        [
+          "5",
+          "thumbs/architectes_majeurs/5.webp",
+          "Le Corbusier",
+          "XXe siècle",
+          "France",
+          "Villa Savoye"
+        ],
+        [
+          "6",
+          "thumbs/architectes_majeurs/6.webp",
+          "Ludwig Mies van der Rohe",
+          "XXe siècle",
+          "Allemagne",
+          "Pavillon de Barcelone"
+        ],
+        [
+          "7",
+          "thumbs/architectes_majeurs/7.webp",
+          "Zaha Hadid",
+          "Contemporain",
+          "Royaume-Uni",
+          "Heydar Aliyev Center"
+        ],
+        [
+          "8",
+          "thumbs/architectes_majeurs/8.webp",
+          "I. M. Pei",
+          "Contemporain",
+          "États-Unis",
+          "Pyramide du Louvre"
+        ]
+      ]
+    },
+    {
+      "id": "musees_monde",
+      "name": "Musées du monde",
+      "icon": "🖼️",
+      "category": "Arts & culture",
+      "columns": [
+        "Numéro",
+        "Image",
+        "Musée",
+        "Ville",
+        "Pays",
+        "Repère"
+      ],
+      "rows": [
+        [
+          "1",
+          "thumbs/musees_monde/1.webp",
+          "Musée du Louvre",
+          "Paris",
+          "France",
+          "Collections encyclopédiques"
+        ],
+        [
+          "2",
+          "thumbs/musees_monde/2.webp",
+          "Metropolitan Museum of Art",
+          "New York",
+          "États-Unis",
+          "The Met"
+        ],
+        [
+          "3",
+          "thumbs/musees_monde/3.webp",
+          "Musée du Prado",
+          "Madrid",
+          "Espagne",
+          "Peinture espagnole"
+        ],
+        [
+          "4",
+          "thumbs/musees_monde/4.webp",
+          "British Museum",
+          "Londres",
+          "Royaume-Uni",
+          "Antiquités mondiales"
+        ],
+        [
+          "5",
+          "thumbs/musees_monde/5.webp",
+          "Musées du Vatican",
+          "Vatican",
+          "Vatican",
+          "Chapelle Sixtine"
+        ],
+        [
+          "6",
+          "thumbs/musees_monde/6.webp",
+          "Galerie des Offices",
+          "Florence",
+          "Italie",
+          "Renaissance italienne"
+        ],
+        [
+          "7",
+          "thumbs/musees_monde/7.webp",
+          "Museum of Modern Art",
+          "New York",
+          "États-Unis",
+          "Art moderne"
+        ],
+        [
+          "8",
+          "thumbs/musees_monde/8.webp",
+          "Musée de l’Ermitage",
+          "Saint-Pétersbourg",
+          "Russie",
+          "Palais d’Hiver"
+        ]
+      ]
+    },
+    {
+      "id": "inventions_majeures",
+      "name": "Inventions majeures",
+      "icon": "⚙️",
+      "category": "Sciences & nature",
+      "columns": [
+        "Numéro",
+        "Image",
+        "Invention",
+        "Date",
+        "Domaine",
+        "Repère"
+      ],
+      "rows": [
+        [
+          "1",
+          "thumbs/inventions_majeures/1.webp",
+          "Imprimerie à caractères mobiles",
+          "v. 1450",
+          "Information",
+          "Gutenberg"
+        ],
+        [
+          "2",
+          "thumbs/inventions_majeures/2.webp",
+          "Télescope",
+          "1608",
+          "Optique",
+          "Observation astronomique"
+        ],
+        [
+          "3",
+          "thumbs/inventions_majeures/3.webp",
+          "Machine à vapeur",
+          "XVIIIe siècle",
+          "Énergie",
+          "Révolution industrielle"
+        ],
+        [
+          "4",
+          "thumbs/inventions_majeures/4.webp",
+          "Télégraphe",
+          "1837",
+          "Communication",
+          "Morse"
+        ],
+        [
+          "5",
+          "thumbs/inventions_majeures/5.webp",
+          "Téléphone",
+          "1876",
+          "Communication",
+          "Bell"
+        ],
+        [
+          "6",
+          "thumbs/inventions_majeures/6.webp",
+          "Avion motorisé",
+          "1903",
+          "Transport",
+          "Frères Wright"
+        ],
+        [
+          "7",
+          "thumbs/inventions_majeures/7.webp",
+          "Transistor",
+          "1947",
+          "Électronique",
+          "Base de l’informatique"
+        ],
+        [
+          "8",
+          "thumbs/inventions_majeures/8.webp",
+          "Web",
+          "1989",
+          "Informatique",
+          "Tim Berners-Lee"
+        ]
+      ]
+    },
+    {
+      "id": "decouvertes_scientifiques",
+      "name": "Découvertes scientifiques",
+      "icon": "🧬",
+      "category": "Sciences & nature",
+      "columns": [
+        "Numéro",
+        "Image",
+        "Découverte",
+        "Date",
+        "Domaine",
+        "Repère"
+      ],
+      "rows": [
+        [
+          "1",
+          "thumbs/decouvertes_scientifiques/1.webp",
+          "Héliocentrisme",
+          "1543",
+          "Astronomie",
+          "Copernic"
+        ],
+        [
+          "2",
+          "thumbs/decouvertes_scientifiques/2.webp",
+          "Gravitation universelle",
+          "1687",
+          "Physique",
+          "Newton"
+        ],
+        [
+          "3",
+          "thumbs/decouvertes_scientifiques/3.webp",
+          "Oxygène",
+          "1774",
+          "Chimie",
+          "Priestley et Lavoisier"
+        ],
+        [
+          "4",
+          "thumbs/decouvertes_scientifiques/4.webp",
+          "Évolution par sélection naturelle",
+          "1859",
+          "Biologie",
+          "Darwin"
+        ],
+        [
+          "5",
+          "thumbs/decouvertes_scientifiques/5.webp",
+          "Tableau périodique",
+          "1869",
+          "Chimie",
+          "Mendeleïev"
+        ],
+        [
+          "6",
+          "thumbs/decouvertes_scientifiques/6.webp",
+          "Radioactivité",
+          "1896",
+          "Physique",
+          "Becquerel"
+        ],
+        [
+          "7",
+          "thumbs/decouvertes_scientifiques/7.webp",
+          "Pénicilline",
+          "1928",
+          "Médecine",
+          "Fleming"
+        ],
+        [
+          "8",
+          "thumbs/decouvertes_scientifiques/8.webp",
+          "Structure de l’ADN",
+          "1953",
+          "Biologie",
+          "Watson, Crick, Franklin"
+        ]
+      ]
+    }
+  ]
+}
