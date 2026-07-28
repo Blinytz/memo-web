@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#12121c">
   <title>Atelier Mémo</title>
-  <link rel="stylesheet" href="atelier/style.css?v=20260728-2">
+  <link rel="stylesheet" href="atelier/style.css?v=20260728-3">
 </head>
 <body>
 <header id="entete">
@@ -71,8 +71,16 @@
     <canvas id="image-preview" width="213" height="160" aria-label="Aperçu"></canvas>
     <div class="remplacement">
       <button id="img-file" class="btn">🔄 Remplacer l’image</button>
+      <button id="img-copy" class="btn">📋 Copier le cadrage</button>
       <input id="img-input" type="file" accept="image/*" hidden>
     </div>
+  </div>
+  <div class="reglages-image">
+    <label>Zoom <input id="img-zoom" type="range" min="100" max="800" value="100"><output id="img-zoom-value">100 %</output></label>
+    <label>Position horizontale <input id="img-x" type="range" min="0" max="100" value="50"></label>
+    <label>Position verticale <input id="img-y" type="range" min="0" max="100" value="50"></label>
+    <label>Étirer horizontalement <input id="img-stretch-x" type="range" min="50" max="200" value="100"><output id="img-stretch-x-value">100 %</output></label>
+    <label>Étirer verticalement <input id="img-stretch-y" type="range" min="50" max="200" value="100"><output id="img-stretch-y-value">100 %</output></label>
   </div>
   <p class="aide">Glissez l’image pour la positionner · molette ou pincement pour zoomer · le cadre correspond à l’image finale.</p>
 
@@ -116,6 +124,6 @@
   <button id="github-connect" class="btn primaire">Vérifier et utiliser</button>
 </dialog>
 
-<script type="module" src="atelier/app.js?v=20260728-2"></script>
+<script type="module" src="atelier/app.js?v=20260728-3"></script>
 </body>
 </html>

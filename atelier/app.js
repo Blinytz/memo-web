@@ -1,4 +1,4 @@
-import { ImageEditor } from './image-editor.js?v=20260728-2';
+import { ImageEditor } from './image-editor.js?v=20260728-3';
 
 const REPO='Blinytz/memo-web',BRANCH='main',API=`https://api.github.com/repos/${REPO}`;
 const token=()=>sessionStorage.getItem('memoGithubToken')||'';
@@ -11,6 +11,12 @@ const statuses=['manquante','importee','a_cadrer','a_verifier','validee','verrou
 const state={data:null,categoryId:'',listId:'',entryId:null,dirty:false,imageDirty:false,editor:null};
 
 function status(text){$('#status').textContent=text}
+function syncImageControls(){
+  if(!state.editor?.source)return;
+  const values=state.editor.controls();
+  for(const [id,key] of [['img-zoom','zoom'],['img-x','x'],['img-y','y'],['img-stretch-x','stretchX'],['img-stretch-y','stretchY']])$('#'+id).value=Math.max(Number($('#'+id).min),Math.min(Number($('#'+id).max),values[key]));
+  $('#img-zoom-value').textContent=`${values.zoom} %`;$('#img-stretch-x-value').textContent=`${values.stretchX} %`;$('#img-stretch-y-value').textContent=`${values.stretchY} %`;
+}
 function currentList(){return state.data.lists.find(list=>list.id===state.listId)}
 function visibleEntries(){
   const query=$('#search').value.trim().toLowerCase(),filter=$('#status-filter').value;
@@ -73,10 +79,10 @@ async function openEntry(id){
   for(const [id,key] of [['f-number','number'],['f-name','name'],['f-title','title'],['f-subtitle','subtitle'],['f-description','description'],['f-extra','extraText'],['f-wiki','wikipedia']])$('#'+id).value=entry[key]||'';
   $('#f-status').value=entry.image?.status||'manquante';$('#f-locked').checked=!!entry.image?.locked;
   $('#dynamic-fields').innerHTML=Object.entries(entry.fields||{}).map(([key,value])=>`<label>${esc(key)}<input data-dynamic="${esc(key)}" value="${esc(value)}"></label>`).join('');
-  state.editor||=new ImageEditor($('#image-frame'),$('#image-source'),$('#image-preview'),()=>{if(state.entryId)state.imageDirty=true});
+  state.editor||=new ImageEditor($('#image-frame'),$('#image-source'),$('#image-preview'),()=>{syncImageControls();if(state.entryId)state.imageDirty=true});
   $('#image-source').removeAttribute('src');$('#image-empty').hidden=!!entry.image?.source;
   if(entry.image?.source){
-    try{await state.editor.load(assetUrl(entry.image.source));state.editor.setCrop(entry.image.crop);state.imageDirty=false}
+    try{await state.editor.load(assetUrl(entry.image.source));state.editor.setCrop(entry.image.crop);syncImageControls();state.imageDirty=false}
     catch{$('#image-empty').hidden=false}
   }
   const entries=listEntries(),index=entries.findIndex(e=>e.id===id);
@@ -141,6 +147,12 @@ $('#ed-save').onclick=saveWithFeedback;$('#save').onclick=saveWithFeedback;
 document.querySelectorAll('#f-number,#f-name,#f-title,#f-subtitle,#f-description,#f-extra,#f-wiki,#f-status,#f-locked').forEach(control=>control.oninput=syncFields);
 $('#dynamic-fields').oninput=syncFields;
 $('#img-minus').onclick=()=>state.editor.zoom(1/1.15);$('#img-plus').onclick=()=>state.editor.zoom(1.15);$('#img-fill').onclick=()=>state.editor.fill();$('#img-contain').onclick=()=>state.editor.contain();
+$('#img-zoom').oninput=e=>state.editor.setZoom(Number(e.target.value));
+$('#img-x').oninput=e=>state.editor.setPan(Number(e.target.value),null);
+$('#img-y').oninput=e=>state.editor.setPan(null,Number(e.target.value));
+$('#img-stretch-x').oninput=e=>state.editor.setStretch(Number(e.target.value)/100,null);
+$('#img-stretch-y').oninput=e=>state.editor.setStretch(null,Number(e.target.value)/100);
+$('#img-copy').onclick=async()=>{try{const blob=await state.editor.copyBlob();await navigator.clipboard.write([new ClipboardItem({'image/png':blob})]);status('image cadrée copiée')}catch(error){console.error(error);alert('La copie directe a été refusée par le navigateur. Utilisez le menu de partage ou essayez depuis Chrome/Edge.')}};
 $('#img-file').onclick=()=>$('#img-input').click();$('#img-input').onchange=e=>loadFile(e.target.files[0]);
 $('#image-frame').ondragover=e=>e.preventDefault();$('#image-frame').ondrop=e=>{e.preventDefault();loadFile(e.dataTransfer.files[0])};
 window.addEventListener('paste',e=>{if($('#editeur').hidden)return;const file=[...e.clipboardData.items].find(i=>i.type.startsWith('image/'))?.getAsFile();if(file)loadFile(file)});
