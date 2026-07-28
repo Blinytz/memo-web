@@ -2,11 +2,12 @@ import { ImageEditor, IMAGE_FORMAT } from './image-editor.js';
 const REPO='Blinytz/memo-web', BRANCH='main', API=`https://api.github.com/repos/${REPO}`;
 const token=()=>sessionStorage.getItem('memoGithubToken')||'';
 const githubHeaders=()=>({'Authorization':`Bearer ${token()}`,'Accept':'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'});
-const assetUrl=value=>{const raw=String(value||'');if(!raw)return '';if(raw.startsWith('data:')||/^https?:/i.test(raw)||raw.startsWith('blob:'))return raw;return new URL(raw.replace(/^\/+/,''),document.baseURI).href};
+const repoUrl=value=>new URL(`../${String(value||'').replace(/^\/+/,'')}`,import.meta.url).href;
+const assetUrl=value=>{const raw=String(value||'');if(!raw)return '';if(raw.startsWith('data:')||/^https?:/i.test(raw)||raw.startsWith('blob:'))return raw;return repoUrl(raw)};
 const $=s=>document.querySelector(s), state={data:null,listId:null,entryId:null,selected:new Set(),undo:[],redo:[],dirty:false,pendingDiff:null,manifest:null};
 const statuses=['manquante','importee','a_cadrer','a_verifier','validee','verrouillee','source_cassee','conflit'];
 let editor;
-async function load(){try{state.data=await (await fetch(`data/atelier/workspace.json?t=${Date.now()}`,{cache:'no-store'})).json();state.listId=state.data.lists.find(l=>!l.deletedAt)?.id;if(!$('#f-status').options.length)statuses.forEach(s=>$('#f-status').add(new Option(s.replaceAll('_',' '),s)));render();status(token()?'enregistré · GitHub connecté':'lecture seule · connecter GitHub')}catch(e){console.error(e);status('erreur de chargement');alert('Impossible de charger les données Mémo. Rechargez la page.')}}
+async function load(){try{const response=await fetch(`${repoUrl('data/atelier/workspace.json')}?t=${Date.now()}`,{cache:'no-store'});if(!response.ok)throw new Error(`Données Mémo indisponibles (${response.status})`);state.data=await response.json();state.listId=state.data.lists.find(l=>!l.deletedAt)?.id;if(!$('#f-status').options.length)statuses.forEach(s=>$('#f-status').add(new Option(s.replaceAll('_',' '),s)));render();status(token()?'enregistré · GitHub connecté':'lecture seule · connecter GitHub')}catch(e){console.error(e);status('erreur de chargement');alert('Impossible de charger les données Mémo. Rechargez la page.')}}
 function status(s){$('#status').textContent=s}
 function snapshot(){state.undo.push(JSON.stringify(state.data));if(state.undo.length>40)state.undo.shift();state.redo=[]}
 function change(fn){snapshot();fn();state.dirty=true;status('modifications en cours');render()}
