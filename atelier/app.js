@@ -1,4 +1,4 @@
-import { ImageEditor } from './image-editor.js';
+import { ImageEditor } from './image-editor.js?v=20260728-2';
 
 const REPO='Blinytz/memo-web',BRANCH='main',API=`https://api.github.com/repos/${REPO}`;
 const token=()=>sessionStorage.getItem('memoGithubToken')||'';
@@ -59,7 +59,7 @@ function renderGrid(){
   $('#metrics').textContent=`${entries.length} entrée${entries.length>1?'s':''} affichée${entries.length>1?'s':''} · cliquez sur une carte pour modifier immédiatement`;
   $('#grid').innerHTML=entries.map(entry=>`<button class="vignette" data-entry="${esc(entry.id)}">
     ${imageBadge(entry)}
-    ${entry.image?.thumb?`<img loading="lazy" src="${esc(assetUrl(entry.image.thumb))}" alt="">`:'<span class="sans-image">＋</span>'}
+    ${entry.image?.thumb?`<img src="${esc(assetUrl(entry.image.thumb))}" alt="" onerror="this.hidden=true;this.nextElementSibling.hidden=false"><span class="sans-image" hidden>Image indisponible</span>`:'<span class="sans-image">＋</span>'}
     <span class="v-nom">${esc(entry.name)}</span>
     <span class="v-meta">N° ${esc(entry.number)} · ${esc((entry.image?.status||'manquante').replaceAll('_',' '))}</span>
   </button>`).join('')||'<p>Aucune entrée pour ces filtres.</p>';
