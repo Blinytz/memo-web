@@ -16,7 +16,7 @@ export class ImageEditor {
   contain(){ this.remember();this.scale=this.minContain;this.center(false); }
   center(clamp=true){this.x=(this.fw-this.iw*this.scale)/2;this.y=(this.fh-this.ih*this.scale)/2;this.render(clamp)}
   crop(){return {cx:(-this.x/this.scale+this.fw/this.scale/2)/this.iw,cy:(-this.y/this.scale+this.fh/this.scale/2)/this.ih,w:this.fw/this.scale/this.iw}}
-  setCrop(c){if(!c?.w)return this.fill();this.scale=this.fw/(c.w*this.iw);this.x=-(c.cx*this.iw-this.fw/this.scale/2)*this.scale;this.y=-(c.cy*this.ih-this.fh/this.scale/2)*this.scale;this.render()}
+  setCrop(c){if(!c?.w)return this.fill();this.scale=Math.max(this.minCover,this.fw/(c.w*this.iw));this.x=-(c.cx*this.iw-this.fw/this.scale/2)*this.scale;this.y=-(c.cy*this.ih-this.fh/this.scale/2)*this.scale;this.render()}
   clamp(){const cover=this.scale>=this.minCover*.999;if(!cover)return;this.x=Math.min(0,Math.max(this.fw-this.iw*this.scale,this.x));this.y=Math.min(0,Math.max(this.fh-this.ih*this.scale,this.y))}
   render(clamp=true){if(clamp)this.clamp();this.image.style.transform=`translate(${this.x}px,${this.y}px) scale(${this.scale})`;this.draw(this.preview,[213,160]);this.onChange(this.crop())}
   zoom(f,cx=this.fw/2,cy=this.fh/2){this.remember();const old=this.scale;this.scale=Math.max(this.minContain,Math.min(this.minCover*12,this.scale*f));const real=this.scale/old;this.x=cx-(cx-this.x)*real;this.y=cy-(cy-this.y)*real;this.render()}

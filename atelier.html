@@ -1,14 +1,121 @@
-<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Atelier Mémo</title><link rel="stylesheet" href="atelier/style.css"></head><body>
-<header><button id="mobile-menu" aria-label="Ouvrir les listes">☰</button><h1>Atelier <span>Mémo</span></h1><input id="search" type="search" placeholder="Rechercher…"><button id="undo">↶</button><button id="redo">↷</button><button id="github-settings" title="Connexion GitHub">⚙</button><button id="save" class="primary">Enregistrer</button><output id="status">Chargement…</output></header>
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#12121c">
+  <title>Atelier Mémo</title>
+  <link rel="stylesheet" href="atelier/style.css">
+</head>
+<body>
+<header id="entete">
+  <div class="titre">🖼️ Atelier <span>Mémo</span></div>
+  <output id="status">Chargement…</output>
+  <nav>
+    <button id="notes-view">Notes</button>
+    <button id="github-settings" title="Connexion GitHub">⚙</button>
+    <button id="save" class="btn primaire">💾 Enregistrer</button>
+  </nav>
+</header>
+
+<div class="barre-filtres">
+  <select id="category-filter" aria-label="Catégorie"></select>
+  <select id="list-filter" aria-label="Liste"></select>
+  <select id="status-filter" aria-label="Statut image">
+    <option value="">Toutes les images</option>
+    <option value="a_traiter">À traiter</option>
+    <option value="validee">Validées</option>
+    <option value="verrouillee">Verrouillées</option>
+  </select>
+  <input id="search" type="search" placeholder="🔎 Rechercher une entrée…">
+  <button id="add-row" class="btn">＋ Nouvelle entrée</button>
+</div>
+
 <main>
-  <aside><div class="aside-head"><b>Catégories et listes</b><button id="close-nav">×</button><button id="add-category">＋</button></div><nav id="nav"></nav><div class="aside-actions"><button id="add-list">Nouvelle liste</button><button id="notes-view">Notes</button><button id="import-wiki">Importer WikiDeck</button></div></aside>
-  <section class="table-pane"><div class="toolbar"><b id="list-title">Liste</b><span id="metrics"></span><button id="add-row">＋ Ligne</button><button id="duplicate-row">Dupliquer</button><button id="trash-row">Corbeille</button><button id="renumber">Renuméroter</button><button id="bulk-note">Note</button></div><div class="table-scroll"><table><thead id="thead"></thead><tbody id="tbody"></tbody></table></div></section>
-  <section class="detail"><div id="empty">Sélectionnez une entrée.</div><form id="form" hidden><div class="detail-head"><b>Fiche complète</b><button type="button" id="close-detail">×</button></div><label>Identifiant<input id="f-id" readonly></label><label>Numéro<input id="f-number"></label><label>Nom / réponse<input id="f-name"></label><label>Titre<input id="f-title"></label><label>Sous-titre<input id="f-subtitle"></label><label>Description<textarea id="f-description"></textarea></label><label>Texte complémentaire<textarea id="f-extra"></textarea></label><label>Lien Wikipédia<div class="inline"><input id="f-wiki" type="url"><a id="open-wiki" target="_blank">Ouvrir</a></div></label><label>Statut image<select id="f-status"></select></label><label class="check"><input id="f-locked" type="checkbox"> Image verrouillée</label><div id="dynamic-fields"></div><button type="button" id="edit-image">Modifier l’image</button></form></section>
+  <section id="vue-grille">
+    <div class="vue-entete">
+      <div><h1 id="list-title">Liste</h1><p id="metrics"></p></div>
+      <div class="actions-liste">
+        <button id="renumber" class="btn">Renuméroter</button>
+        <button id="bulk-note" class="btn">Note</button>
+      </div>
+    </div>
+    <div id="grid" class="grille"></div>
+  </section>
 </main>
-<dialog id="image-dialog"><div class="dialog-head"><b>Image — cadre WikiDeck 800 × 600</b><button data-close>×</button></div><div class="image-layout"><div><div id="image-frame"><img id="image-source" alt=""></div><div class="image-tools"><button id="img-file">Importer</button><input id="img-input" type="file" accept="image/*" hidden><button id="img-fill">Remplir</button><button id="img-contain">Image entière</button><button id="img-minus">−</button><button id="img-plus">＋</button><button id="img-undo">Annuler</button></div></div><div><small>Miniature dérivée en direct</small><canvas id="image-preview" width="213" height="160"></canvas></div></div><p>Glissez, utilisez la molette ou pincez. Vous pouvez aussi déposer ou coller une image.</p><button id="img-save" class="primary">Enregistrer l’image</button></dialog>
-<dialog id="notes-dialog"><div class="dialog-head"><b>Notes éditoriales</b><button data-close>×</button></div><div id="notes-list"></div><textarea id="note-text" placeholder="Nouvelle note…"></textarea><div class="inline"><select id="note-status"><option value="todo">À faire</option><option value="doing">En cours</option><option value="done">Terminée</option></select><select id="note-priority"><option>normale</option><option>haute</option><option>basse</option></select><button id="note-add">Ajouter aux cibles sélectionnées</button></div></dialog>
-<dialog id="diff-dialog"><div class="dialog-head"><b>Aperçu des modifications</b><button data-close>×</button></div><div id="diff-content"></div><button id="diff-apply" class="primary">Confirmer</button></dialog>
-<dialog id="import-dialog"><div class="dialog-head"><b>Importer depuis WikiDeck</b><button data-close>×</button></div><input id="manifest-input" type="file" accept=".json"><p>Chargez le <code>manifest.json</code> exporté. L’analyse est toujours sans écriture.</p><div id="import-report"></div><button id="import-apply" class="primary" hidden>Appliquer les correspondances certaines et probables</button></dialog>
-<dialog id="github-dialog"><div class="dialog-head"><b>Connexion GitHub</b><button data-close>×</button></div><p>Pour enregistrer, saisissez un jeton GitHub autorisé à modifier <code>Blinytz/memo-web</code>. Il reste uniquement dans cet onglet et disparaît à sa fermeture.</p><label class="token-label">Jeton<input id="github-token" type="password" autocomplete="off"></label><button id="github-connect" class="primary">Vérifier et utiliser</button></dialog>
-<script type="module" src="atelier/app.js"></script></body></html>
+
+<section id="editeur" class="editeur" hidden>
+  <header class="editeur-entete">
+    <button id="ed-close" class="btn discret">✕ Fermer</button>
+    <button id="ed-prev" class="btn nav-card" aria-label="Entrée précédente">←</button>
+    <div class="ed-titre"><b id="ed-name"></b><small id="ed-info"></small></div>
+    <button id="ed-next" class="btn nav-card" aria-label="Entrée suivante">→</button>
+    <button id="ed-save" class="btn primaire">💾 Enregistrer</button>
+  </header>
+
+  <div class="editeur-scene">
+    <div id="image-frame" class="cadre-image">
+      <img id="image-source" alt="" draggable="false">
+      <div class="repere-cadre"></div>
+      <div id="image-empty" class="image-empty" hidden>Déposez, collez ou importez une image</div>
+    </div>
+  </div>
+
+  <div class="editeur-outils">
+    <div class="zoom">
+      <button id="img-minus" class="btn">−</button>
+      <button id="img-plus" class="btn">＋</button>
+      <button id="img-fill" class="btn discret">↺ Recadrer auto</button>
+      <button id="img-contain" class="btn discret">Image entière</button>
+    </div>
+    <canvas id="image-preview" width="213" height="160" aria-label="Aperçu"></canvas>
+    <div class="remplacement">
+      <button id="img-file" class="btn">🔄 Remplacer l’image</button>
+      <input id="img-input" type="file" accept="image/*" hidden>
+    </div>
+  </div>
+  <p class="aide">Glissez l’image pour la positionner · molette ou pincement pour zoomer · le cadre correspond à l’image finale.</p>
+
+  <div class="fiche">
+    <h2>Fiche Mémo</h2>
+    <div class="champs">
+      <label>Numéro<input id="f-number"></label>
+      <label class="large">Nom / réponse<input id="f-name"></label>
+      <label class="large">Titre<input id="f-title"></label>
+      <label class="large">Sous-titre<input id="f-subtitle"></label>
+      <label class="large">Description<textarea id="f-description"></textarea></label>
+      <label class="large">Texte complémentaire<textarea id="f-extra"></textarea></label>
+      <label class="large">Lien Wikipédia<input id="f-wiki" type="url"></label>
+      <label>Statut<select id="f-status"></select></label>
+      <label class="check"><input id="f-locked" type="checkbox"> Image verrouillée</label>
+      <div id="dynamic-fields" class="dynamic-fields"></div>
+    </div>
+    <div class="fiche-actions">
+      <button id="duplicate-row" class="btn">Dupliquer</button>
+      <button id="entry-note" class="btn">📝 Note</button>
+      <button id="trash-row" class="btn danger">🗑 Supprimer</button>
+    </div>
+  </div>
+</section>
+
+<dialog id="notes-dialog">
+  <div class="dialog-head"><b>Notes éditoriales</b><button data-close>×</button></div>
+  <div id="notes-list"></div>
+  <textarea id="note-text" placeholder="Nouvelle note…"></textarea>
+  <div class="dialog-actions">
+    <select id="note-status"><option value="todo">À faire</option><option value="doing">En cours</option><option value="done">Terminée</option></select>
+    <select id="note-priority"><option>normale</option><option>haute</option><option>basse</option></select>
+    <button id="note-add" class="btn primaire">Ajouter</button>
+  </div>
+</dialog>
+
+<dialog id="github-dialog">
+  <div class="dialog-head"><b>Connexion GitHub</b><button data-close>×</button></div>
+  <p>Le jeton autorisé à modifier <code>Blinytz/memo-web</code> reste uniquement dans cet onglet.</p>
+  <label>Jeton<input id="github-token" type="password" autocomplete="off"></label>
+  <button id="github-connect" class="btn primaire">Vérifier et utiliser</button>
+</dialog>
+
+<script type="module" src="atelier/app.js"></script>
+</body>
+</html>

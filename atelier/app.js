@@ -1,43 +1,158 @@
-import { ImageEditor, IMAGE_FORMAT } from './image-editor.js';
-const REPO='Blinytz/memo-web', BRANCH='main', API=`https://api.github.com/repos/${REPO}`;
+import { ImageEditor } from './image-editor.js';
+
+const REPO='Blinytz/memo-web',BRANCH='main',API=`https://api.github.com/repos/${REPO}`;
 const token=()=>sessionStorage.getItem('memoGithubToken')||'';
-const githubHeaders=()=>({'Authorization':`Bearer ${token()}`,'Accept':'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'});
+const headers=()=>({'Authorization':`Bearer ${token()}`,'Accept':'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'});
 const repoUrl=value=>new URL(`../${String(value||'').replace(/^\/+/,'')}`,import.meta.url).href;
-const assetUrl=value=>{const raw=String(value||'');if(!raw)return '';if(raw.startsWith('data:')||/^https?:/i.test(raw)||raw.startsWith('blob:'))return raw;return repoUrl(raw)};
-const $=s=>document.querySelector(s), state={data:null,listId:null,entryId:null,selected:new Set(),undo:[],redo:[],dirty:false,pendingDiff:null,manifest:null};
+const assetUrl=value=>{const raw=String(value||'');return !raw?'':raw.startsWith('data:')||/^https?:|^blob:/i.test(raw)?raw:repoUrl(raw)};
+const $=selector=>document.querySelector(selector);
+const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const statuses=['manquante','importee','a_cadrer','a_verifier','validee','verrouillee','source_cassee','conflit'];
-let editor;
-async function load(){try{const response=await fetch(`${repoUrl('data/atelier/workspace.json')}?t=${Date.now()}`,{cache:'no-store'});if(!response.ok)throw new Error(`Données Mémo indisponibles (${response.status})`);state.data=await response.json();state.listId=state.data.lists.find(l=>!l.deletedAt)?.id;if(!$('#f-status').options.length)statuses.forEach(s=>$('#f-status').add(new Option(s.replaceAll('_',' '),s)));render();status(token()?'enregistré · GitHub connecté':'lecture seule · connecter GitHub')}catch(e){console.error(e);status('erreur de chargement');alert('Impossible de charger les données Mémo. Rechargez la page.')}}
-function status(s){$('#status').textContent=s}
-function snapshot(){state.undo.push(JSON.stringify(state.data));if(state.undo.length>40)state.undo.shift();state.redo=[]}
-function change(fn){snapshot();fn();state.dirty=true;status('modifications en cours');render()}
-function currentList(){return state.data.lists.find(l=>l.id===state.listId)}
-function entries(){return state.data.entries.filter(e=>e.listId===state.listId&&!e.deletedAt)}
-function render(){renderNav();renderTable();renderDetail()}
-function renderNav(){const q=$('#search').value.toLowerCase();$('#nav').innerHTML=state.data.categories.filter(c=>!c.deletedAt).sort((a,b)=>a.order-b.order).map(c=>`<div class="category">${esc(c.name)}</div>${state.data.lists.filter(l=>l.categoryId===c.id&&!l.deletedAt&&(!q||l.name.toLowerCase().includes(q)||state.data.entries.some(e=>e.listId===l.id&&e.name.toLowerCase().includes(q)))).sort((a,b)=>a.order-b.order).map(l=>`<button class="list ${l.id===state.listId?'active':''}" data-list="${l.id}">${esc(l.icon)} ${esc(l.name)} <small>(${state.data.entries.filter(e=>e.listId===l.id&&!e.deletedAt).length})</small></button>`).join('')}`).join('')}
-function renderTable(){const list=currentList();if(!list)return;$('#list-title').textContent=list.name;const es=entries().filter(e=>!$('#search').value||JSON.stringify(e).toLowerCase().includes($('#search').value.toLowerCase()));const missing=es.filter(e=>['manquante','source_cassee','conflit'].includes(e.image?.status)).length;$('#metrics').textContent=`${es.length} entrées · ${missing} image(s) à traiter`;$('#thead').innerHTML=`<tr><th>✓</th><th>N°</th><th>Image</th><th>Nom</th>${list.columns.slice(2).map(c=>`<th>${esc(c)}</th>`).join('')}</tr>`;$('#tbody').innerHTML=es.sort((a,b)=>a.order-b.order).map(e=>`<tr data-entry="${e.id}" class="${state.selected.has(e.id)?'selected':''}"><td><input type="checkbox" ${state.selected.has(e.id)?'checked':''}></td><td contenteditable data-field="number">${esc(e.number)}</td><td>${e.image?.thumb?`<img loading="lazy" src="${esc(assetUrl(e.image.thumb))}">`:'—'}</td><td contenteditable data-field="name">${esc(e.name)}</td>${list.columns.slice(2).map(c=>`<td contenteditable data-extra="${esc(c)}">${esc(e.fields?.[c]||'')}</td>`).join('')}</tr>`).join('')}
-function renderDetail(){const e=state.data.entries.find(x=>x.id===state.entryId);$('#empty').hidden=!!e;$('#form').hidden=!e;if(!e)return;for(const [id,key] of [['f-id','id'],['f-number','number'],['f-name','name'],['f-title','title'],['f-subtitle','subtitle'],['f-description','description'],['f-extra','extraText'],['f-wiki','wikipedia']])$(id.startsWith('#')?id:'#'+id).value=e[key]||'';$('#f-status').value=e.image?.status||'manquante';$('#f-locked').checked=!!e.image?.locked;$('#open-wiki').href=e.wikipedia||'#';$('#dynamic-fields').innerHTML=Object.entries(e.fields||{}).map(([k,v])=>`<label>${esc(k)}<input data-dynamic="${esc(k)}" value="${esc(v)}"></label>`).join('')}
-function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-async function githubCommit(files,message){if(!token()){status('connexion GitHub requise');$('#github-dialog').showModal();throw new Error('Jeton GitHub requis')}const ref=await fetch(`${API}/git/ref/heads/${BRANCH}`,{headers:githubHeaders(),cache:'no-store'});if(!ref.ok)throw new Error(`Connexion GitHub refusée (${ref.status})`);const parent=(await ref.json()).object.sha;const commit=await (await fetch(`${API}/git/commits/${parent}`,{headers:githubHeaders()})).json();const tree=[];for(const f of files){const r=await fetch(`${API}/git/blobs`,{method:'POST',headers:{...githubHeaders(),'Content-Type':'application/json'},body:JSON.stringify({content:f.base64||btoa(unescape(encodeURIComponent(f.text))),encoding:'base64'})});if(!r.ok)throw new Error(`Échec du fichier ${f.path}`);tree.push({path:f.path,mode:'100644',type:'blob',sha:(await r.json()).sha})}const tr=await fetch(`${API}/git/trees`,{method:'POST',headers:{...githubHeaders(),'Content-Type':'application/json'},body:JSON.stringify({base_tree:commit.tree.sha,tree})});if(!tr.ok)throw new Error('Échec de préparation du commit');const cr=await fetch(`${API}/git/commits`,{method:'POST',headers:{...githubHeaders(),'Content-Type':'application/json'},body:JSON.stringify({message,tree:(await tr.json()).sha,parents:[parent]})});if(!cr.ok)throw new Error('Échec de création du commit');const next=(await cr.json()).sha;const ur=await fetch(`${API}/git/refs/heads/${BRANCH}`,{method:'PATCH',headers:{...githubHeaders(),'Content-Type':'application/json'},body:JSON.stringify({sha:next,force:false})});if(!ur.ok)throw new Error('Conflit : rechargez la page avant de réessayer');return next}
-async function save(){try{state.data.revision=Number(state.data.revision||0)+1;state.data.updatedAt=new Date().toISOString();await githubCommit([{path:'data/atelier/workspace.json',text:JSON.stringify(state.data,null,2)+'\n'}],'Atelier Mémo : mise à jour des données');state.dirty=false;status('enregistré sur GitHub')}catch(e){state.data.revision=Math.max(1,state.data.revision-1);status('erreur');alert(e.message)}}
-$('#nav').onclick=e=>{const id=e.target.closest('[data-list]')?.dataset.list;if(id){state.listId=id;state.entryId=null;state.selected.clear();$('aside').classList.remove('mobile-open');render()}};
-$('#mobile-menu').onclick=()=>$('aside').classList.add('mobile-open');$('#close-nav').onclick=()=>$('aside').classList.remove('mobile-open');
-$('#tbody').onclick=e=>{const tr=e.target.closest('tr');if(!tr)return;const id=tr.dataset.entry;if(e.target.type==='checkbox'){e.target.checked?state.selected.add(id):state.selected.delete(id)}else state.entryId=id;render()};
-$('#tbody').oninput=e=>{const tr=e.target.closest('tr'),entry=state.data.entries.find(x=>x.id===tr?.dataset.entry);if(!entry)return;if(!state.dirty)snapshot();if(e.target.dataset.field)entry[e.target.dataset.field]=e.target.textContent;if(e.target.dataset.extra)entry.fields[e.target.dataset.extra]=e.target.textContent;state.dirty=true;status('modifications en cours')};
-$('#search').oninput=render;$('#save').onclick=save;window.addEventListener('beforeunload',e=>{if(state.dirty){e.preventDefault();e.returnValue=''}});
-for(const [id,key] of [['f-number','number'],['f-name','name'],['f-title','title'],['f-subtitle','subtitle'],['f-description','description'],['f-extra','extraText'],['f-wiki','wikipedia']])$('#'+id).oninput=e=>{const entry=state.data.entries.find(x=>x.id===state.entryId);if(!state.dirty)snapshot();entry[key]=e.target.value;state.dirty=true;status('modifications en cours');if(key==='wikipedia')$('#open-wiki').href=e.target.value};
-$('#dynamic-fields').oninput=e=>{const entry=state.data.entries.find(x=>x.id===state.entryId);entry.fields[e.target.dataset.dynamic]=e.target.value;state.dirty=true;status('modifications en cours')};$('#f-status').onchange=e=>change(()=>state.data.entries.find(x=>x.id===state.entryId).image.status=e.target.value);$('#f-locked').onchange=e=>change(()=>state.data.entries.find(x=>x.id===state.entryId).image.locked=e.target.checked);
-$('#add-category').onclick=()=>{const name=prompt('Nom de la catégorie');if(name)change(()=>state.data.categories.push({id:crypto.randomUUID(),name,order:state.data.categories.length,deletedAt:null}))};$('#add-list').onclick=()=>{const name=prompt('Nom de la liste'),cat=state.data.categories.find(c=>!c.deletedAt);if(name&&cat)change(()=>{const l={id:crypto.randomUUID(),name,icon:'📚',categoryId:cat.id,columns:['Numéro','Image','Nom'],order:state.data.lists.length,metadata:{},deletedAt:null};state.data.lists.push(l);state.listId=l.id})};
-$('#add-row').onclick=()=>change(()=>{const list=currentList(),e={id:crypto.randomUUID(),listId:list.id,number:String(entries().length+1),name:'Nouvelle entrée',title:'Nouvelle entrée',subtitle:'',description:'',extraText:'',wikipedia:'',fields:{},order:entries().length,deletedAt:null,externalIds:{},image:{source:null,full:null,thumb:null,crop:{cx:.5,cy:.5,w:1},status:'manquante',locked:false,provenance:{}}};state.data.entries.push(e);state.entryId=e.id});
-$('#duplicate-row').onclick=()=>{const src=state.data.entries.find(e=>state.selected.has(e.id)||e.id===state.entryId);if(src)change(()=>state.data.entries.push({...structuredClone(src),id:crypto.randomUUID(),number:String(Number(src.number||0)+1),order:entries().length,image:{...src.image,locked:false}}))};$('#trash-row').onclick=()=>{if(!confirm('Placer la sélection dans la corbeille ?'))return;change(()=>state.data.entries.filter(e=>state.selected.has(e.id)||(state.selected.size===0&&e.id===state.entryId)).forEach(e=>{e.deletedAt=new Date().toISOString();state.data.trash.push({type:'entry',id:e.id,at:e.deletedAt})}))};
-$('#renumber').onclick=()=>{const start=Number(prompt('Premier numéro',1));if(!start)return;const targets=state.selected.size?entries().filter(e=>state.selected.has(e.id)):entries();state.pendingDiff=targets.map((e,i)=>({id:e.id,field:'number',before:e.number,after:String(start+i)}));showDiff()};function showDiff(){$('#diff-content').innerHTML=state.pendingDiff.map(d=>`<div class="diff-row"><b>${esc(d.id.slice(0,12))}</b><span>${esc(d.before)}</span><b>→</b><span>${esc(d.after)}</span></div>`).join('');$('#diff-dialog').showModal()}$('#diff-apply').onclick=()=>change(()=>{for(const d of state.pendingDiff){const e=state.data.entries.find(x=>x.id===d.id);e[d.field]=d.after}state.pendingDiff=null;$('#diff-dialog').close()});
-$('#undo').onclick=()=>{if(!state.undo.length)return;state.redo.push(JSON.stringify(state.data));state.data=JSON.parse(state.undo.pop());state.dirty=true;render()};$('#redo').onclick=()=>{if(!state.redo.length)return;state.undo.push(JSON.stringify(state.data));state.data=JSON.parse(state.redo.pop());state.dirty=true;render()};
-document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>b.closest('dialog').close());$('#close-detail').onclick=()=>{$('.detail').classList.remove('mobile-open');state.entryId=null;renderDetail()};
-$('#notes-view').onclick=$('#bulk-note').onclick=()=>{renderNotes();$('#notes-dialog').showModal()};function renderNotes(){$('#notes-list').innerHTML=state.data.notes.map(n=>`<div class="note"><b>${esc(n.status)} · ${esc(n.priority)}</b><p>${esc(n.text)}</p><small>${n.targets.entryIds.length} entrée(s), ${n.targets.listIds.length} liste(s)</small></div>`).join('')||'<p>Aucune note.</p>'}$('#note-add').onclick=()=>{const text=$('#note-text').value.trim();if(!text)return;change(()=>state.data.notes.push({id:crypto.randomUUID(),text,targets:{entryIds:[...state.selected],listIds:state.selected.size?[]:[state.listId]},createdAt:new Date().toISOString(),updatedAt:new Date().toISOString(),status:$('#note-status').value,priority:$('#note-priority').value}));$('#note-text').value='';renderNotes()};
-$('#edit-image').onclick=async()=>{const e=state.data.entries.find(x=>x.id===state.entryId);if(e.image?.locked&&!confirm('Cette image est verrouillée. La modifier ?'))return;$('#image-dialog').showModal();editor ||= new ImageEditor($('#image-frame'),$('#image-source'),$('#image-preview'));if(e.image?.source)try{await editor.load(assetUrl(e.image.source));editor.setCrop(e.image.crop)}catch{alert('Image source illisible. Importez un nouveau fichier.')}};$('#img-file').onclick=()=>$('#img-input').click();$('#img-input').onchange=e=>loadFile(e.target.files[0]);async function loadFile(f){if(!f)return;await editor.load(URL.createObjectURL(f))}$('#image-frame').ondragover=e=>e.preventDefault();$('#image-frame').ondrop=e=>{e.preventDefault();loadFile(e.dataTransfer.files[0])};window.addEventListener('paste',e=>{if(!$('#image-dialog').open)return;const f=[...e.clipboardData.items].find(i=>i.type.startsWith('image/'))?.getAsFile();if(f)loadFile(f)});$('#img-fill').onclick=()=>editor.fill();$('#img-contain').onclick=()=>editor.contain();$('#img-plus').onclick=()=>editor.zoom(1.2);$('#img-minus').onclick=()=>editor.zoom(1/1.2);$('#img-undo').onclick=()=>editor.back();
-const blob64=b=>new Promise((ok,no)=>{const f=new FileReader();f.onload=()=>ok(f.result.split(',')[1]);f.onerror=no;f.readAsDataURL(b)});
-$('#img-save').onclick=async()=>{try{const e=state.data.entries.find(x=>x.id===state.entryId),out=await editor.exports(),base=`assets/atelier/${e.id}`;e.image.source=`${base}/original.webp`;e.image.full=`${base}/full.webp`;e.image.thumb=`${base}/thumb.webp`;e.image.crop=editor.crop();e.image.status='importee';e.image.provenance={kind:'manual',at:new Date().toISOString()};state.data.revision=Number(state.data.revision||0)+1;state.data.updatedAt=new Date().toISOString();await githubCommit([{path:`${base}/original.webp`,base64:await blob64(out.original)},{path:`${base}/full.webp`,base64:await blob64(out.full)},{path:`${base}/thumb.webp`,base64:await blob64(out.thumb)},{path:'data/atelier/workspace.json',text:JSON.stringify(state.data,null,2)+'\n'}],`Atelier Mémo : image ${e.name}`);state.dirty=false;status('image enregistrée sur GitHub');$('#image-dialog').close();render()}catch(e){status('erreur');alert(e.message)}};
-$('#import-wiki').onclick=()=>$('#import-dialog').showModal();$('#manifest-input').onchange=async e=>{state.manifest=JSON.parse(await e.target.files[0].text());const r=await fetch('/api/wikideck/preview',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(state.manifest)}),report=await r.json();state.importReport=report;const count=k=>report.matches.filter(m=>m.status===k).length;$('#import-report').innerHTML=`<p><b>Analyse sans écriture</b></p><span class="badge">${count('certain')} certaines</span><span class="badge">${count('probable')} probables</span><span class="badge">${count('ambiguous')} ambiguës</span><span class="badge">${count('wikideck_only')} absentes de Mémo</span><p>Les images verrouillées ne seront jamais remplacées sans décision explicite. Les ambiguïtés et cartes absentes sont laissées pour décision manuelle.</p>`;$('#import-apply').hidden=false};
-$('#import-apply').onclick=async()=>{if(!confirm('Appliquer uniquement les correspondances non ambiguës affichées ?'))return;const decisions=state.importReport.matches.filter(m=>['certain','probable'].includes(m.status)&&m.candidates.length===1).map(m=>({cardId:m.card.id,entryId:m.candidates[0].id}));const r=await fetch('/api/wikideck/apply',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...state.manifest,confirm:true,decisions})}),j=await r.json();if(!r.ok)return alert(j.error||j.errors?.join('\n'));$('#import-report').innerHTML+=`<p><b>${j.results.filter(x=>x.status==='imported').length} image(s) importée(s).</b> ${j.results.filter(x=>x.status==='conflict').length} conflit(s) préservé(s).</p>`;await load()};
-setInterval(()=>{if(state.dirty)save()},30000);load();
-$('#github-settings').onclick=()=>{$('#github-token').value=token();$('#github-dialog').showModal()};$('#github-connect').onclick=async()=>{const value=$('#github-token').value.trim();sessionStorage.setItem('memoGithubToken',value);const r=await fetch(`${API}`,{headers:githubHeaders()});if(!r.ok){sessionStorage.removeItem('memoGithubToken');return alert('Jeton refusé ou accès insuffisant.')}$('#github-dialog').close();status('enregistré · GitHub connecté')};
+const state={data:null,categoryId:'',listId:'',entryId:null,dirty:false,imageDirty:false,editor:null};
+
+function status(text){$('#status').textContent=text}
+function currentList(){return state.data.lists.find(list=>list.id===state.listId)}
+function visibleEntries(){
+  const query=$('#search').value.trim().toLowerCase(),filter=$('#status-filter').value;
+  return state.data.entries.filter(entry=>{
+    if(entry.deletedAt||entry.listId!==state.listId)return false;
+    const imageStatus=entry.image?.status||'manquante';
+    if(filter==='a_traiter'&&!['manquante','a_cadrer','a_verifier','source_cassee','conflit'].includes(imageStatus))return false;
+    if(filter==='validee'&&imageStatus!=='validee')return false;
+    if(filter==='verrouillee'&&!entry.image?.locked)return false;
+    return !query||`${entry.number} ${entry.name} ${entry.title} ${entry.subtitle}`.toLowerCase().includes(query);
+  }).sort((a,b)=>a.order-b.order);
+}
+function listEntries(){return state.data.entries.filter(e=>e.listId===state.listId&&!e.deletedAt).sort((a,b)=>a.order-b.order)}
+
+async function load(){
+  try{
+    const response=await fetch(`${repoUrl('data/atelier/workspace.json')}?t=${Date.now()}`,{cache:'no-store'});
+    if(!response.ok)throw new Error(`Données indisponibles (${response.status})`);
+    state.data=await response.json();
+    state.categoryId=state.data.categories.find(c=>!c.deletedAt)?.id||'';
+    state.listId=state.data.lists.find(l=>!l.deletedAt&&(!state.categoryId||l.categoryId===state.categoryId))?.id||state.data.lists.find(l=>!l.deletedAt)?.id;
+    statuses.forEach(s=>$('#f-status').add(new Option(s.replaceAll('_',' '),s)));
+    renderFilters();renderGrid();
+    status(token()?'GitHub connecté':'lecture seule · connecter GitHub');
+  }catch(error){console.error(error);status('erreur de chargement');alert('Impossible de charger les données Mémo.')}
+}
+
+function renderFilters(){
+  $('#category-filter').innerHTML=state.data.categories.filter(c=>!c.deletedAt).sort((a,b)=>a.order-b.order).map(c=>`<option value="${esc(c.id)}">${esc(c.name)}</option>`).join('');
+  $('#category-filter').value=state.categoryId;
+  const lists=state.data.lists.filter(l=>!l.deletedAt&&(!state.categoryId||l.categoryId===state.categoryId)).sort((a,b)=>a.order-b.order);
+  $('#list-filter').innerHTML=lists.map(l=>`<option value="${esc(l.id)}">${esc(l.icon||'')} ${esc(l.name)} (${listCount(l.id)})</option>`).join('');
+  if(!lists.some(l=>l.id===state.listId))state.listId=lists[0]?.id||'';
+  $('#list-filter').value=state.listId;
+}
+function listCount(id){return state.data.entries.filter(e=>e.listId===id&&!e.deletedAt).length}
+function imageBadge(entry){
+  if(entry.image?.locked)return '<span class="v-statut ok">🔒</span>';
+  if(entry.image?.status==='validee')return '<span class="v-statut ok">✓</span>';
+  if(['manquante','source_cassee','conflit'].includes(entry.image?.status))return '<span class="v-statut warn">!</span>';
+  return '';
+}
+function renderGrid(){
+  const list=currentList(),entries=visibleEntries();
+  $('#list-title').textContent=list?.name||'Liste';
+  $('#metrics').textContent=`${entries.length} entrée${entries.length>1?'s':''} affichée${entries.length>1?'s':''} · cliquez sur une carte pour modifier immédiatement`;
+  $('#grid').innerHTML=entries.map(entry=>`<button class="vignette" data-entry="${esc(entry.id)}">
+    ${imageBadge(entry)}
+    ${entry.image?.thumb?`<img loading="lazy" src="${esc(assetUrl(entry.image.thumb))}" alt="">`:'<span class="sans-image">＋</span>'}
+    <span class="v-nom">${esc(entry.name)}</span>
+    <span class="v-meta">N° ${esc(entry.number)} · ${esc((entry.image?.status||'manquante').replaceAll('_',' '))}</span>
+  </button>`).join('')||'<p>Aucune entrée pour ces filtres.</p>';
+}
+
+async function openEntry(id){
+  const entry=state.data.entries.find(e=>e.id===id);if(!entry)return;
+  state.entryId=id;state.imageDirty=false;
+  $('#editeur').hidden=false;document.body.style.overflow='hidden';
+  $('#ed-name').textContent=entry.name;$('#ed-info').textContent=`${currentList()?.name||''} · n° ${entry.number}`;
+  for(const [id,key] of [['f-number','number'],['f-name','name'],['f-title','title'],['f-subtitle','subtitle'],['f-description','description'],['f-extra','extraText'],['f-wiki','wikipedia']])$('#'+id).value=entry[key]||'';
+  $('#f-status').value=entry.image?.status||'manquante';$('#f-locked').checked=!!entry.image?.locked;
+  $('#dynamic-fields').innerHTML=Object.entries(entry.fields||{}).map(([key,value])=>`<label>${esc(key)}<input data-dynamic="${esc(key)}" value="${esc(value)}"></label>`).join('');
+  state.editor||=new ImageEditor($('#image-frame'),$('#image-source'),$('#image-preview'),()=>{if(state.entryId)state.imageDirty=true});
+  $('#image-source').removeAttribute('src');$('#image-empty').hidden=!!entry.image?.source;
+  if(entry.image?.source){
+    try{await state.editor.load(assetUrl(entry.image.source));state.editor.setCrop(entry.image.crop);state.imageDirty=false}
+    catch{$('#image-empty').hidden=false}
+  }
+  const entries=listEntries(),index=entries.findIndex(e=>e.id===id);
+  $('#ed-prev').disabled=index<=0;$('#ed-next').disabled=index<0||index>=entries.length-1;
+  $('#editeur').scrollTop=0;
+}
+function closeEditor(){state.entryId=null;$('#editeur').hidden=true;document.body.style.overflow='';renderGrid()}
+function markDirty(){state.dirty=true;status('modifications en cours')}
+function syncFields(){
+  const entry=state.data.entries.find(e=>e.id===state.entryId);if(!entry)return;
+  for(const [id,key] of [['f-number','number'],['f-name','name'],['f-title','title'],['f-subtitle','subtitle'],['f-description','description'],['f-extra','extraText'],['f-wiki','wikipedia']])entry[key]=$('#'+id).value;
+  entry.image.status=$('#f-status').value;entry.image.locked=$('#f-locked').checked;
+  document.querySelectorAll('[data-dynamic]').forEach(input=>entry.fields[input.dataset.dynamic]=input.value);
+  $('#ed-name').textContent=entry.name;markDirty();
+}
+
+async function githubCommit(files,message){
+  if(!token()){$('#github-dialog').showModal();throw new Error('Connectez GitHub pour enregistrer.')}
+  const refResponse=await fetch(`${API}/git/ref/heads/${BRANCH}`,{headers:headers(),cache:'no-store'});
+  if(!refResponse.ok)throw new Error(`Connexion GitHub refusée (${refResponse.status})`);
+  const parent=(await refResponse.json()).object.sha;
+  const commit=await (await fetch(`${API}/git/commits/${parent}`,{headers:headers()})).json();
+  const tree=[];
+  for(const file of files){
+    const blob=await fetch(`${API}/git/blobs`,{method:'POST',headers:{...headers(),'Content-Type':'application/json'},body:JSON.stringify({content:file.base64||btoa(unescape(encodeURIComponent(file.text))),encoding:'base64'})});
+    if(!blob.ok)throw new Error(`Échec du fichier ${file.path}`);
+    tree.push({path:file.path,mode:'100644',type:'blob',sha:(await blob.json()).sha});
+  }
+  const treeResponse=await fetch(`${API}/git/trees`,{method:'POST',headers:{...headers(),'Content-Type':'application/json'},body:JSON.stringify({base_tree:commit.tree.sha,tree})});
+  const commitResponse=await fetch(`${API}/git/commits`,{method:'POST',headers:{...headers(),'Content-Type':'application/json'},body:JSON.stringify({message,tree:(await treeResponse.json()).sha,parents:[parent]})});
+  const sha=(await commitResponse.json()).sha;
+  const update=await fetch(`${API}/git/refs/heads/${BRANCH}`,{method:'PATCH',headers:{...headers(),'Content-Type':'application/json'},body:JSON.stringify({sha,force:false})});
+  if(!update.ok)throw new Error('Conflit : rechargez la page avant de réessayer.');
+}
+const blob64=blob=>new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result.split(',')[1]);reader.onerror=reject;reader.readAsDataURL(blob)});
+async function saveCurrent(){
+  const entry=state.data.entries.find(e=>e.id===state.entryId),files=[];
+  if(entry&&state.imageDirty&&state.editor?.source){
+    const output=await state.editor.exports(),base=`assets/atelier/${entry.id}`;
+    entry.image.source=`${base}/original.webp`;entry.image.full=`${base}/full.webp`;entry.image.thumb=`${base}/thumb.webp`;entry.image.crop=state.editor.crop();entry.image.status=entry.image.locked?'verrouillee':'importee';entry.image.provenance={kind:'manual',at:new Date().toISOString()};
+    files.push({path:`${base}/original.webp`,base64:await blob64(output.original)},{path:`${base}/full.webp`,base64:await blob64(output.full)},{path:`${base}/thumb.webp`,base64:await blob64(output.thumb)});
+  }
+  state.data.revision=Number(state.data.revision||0)+1;state.data.updatedAt=new Date().toISOString();
+  files.push({path:'data/atelier/workspace.json',text:JSON.stringify(state.data,null,2)+'\n'});
+  await githubCommit(files,entry?`Atelier Mémo : ${entry.name}`:'Atelier Mémo : mise à jour');
+  state.dirty=false;state.imageDirty=false;status('enregistré sur GitHub');
+}
+
+async function saveWithFeedback(){try{status('enregistrement…');await saveCurrent();if(state.entryId)await openEntry(state.entryId)}catch(error){status('erreur');alert(error.message)}}
+function navigate(delta){const entries=listEntries(),index=entries.findIndex(e=>e.id===state.entryId),target=entries[index+delta];if(target)openEntry(target.id)}
+async function loadFile(file){if(!file)return;await state.editor.load(URL.createObjectURL(file));$('#image-empty').hidden=true;state.imageDirty=true;markDirty()}
+function renderNotes(){
+  $('#notes-list').innerHTML=state.data.notes.map(n=>`<div class="note"><b>${esc(n.status)} · ${esc(n.priority)}</b><p>${esc(n.text)}</p><small>${n.targets.entryIds.length} entrée(s)</small></div>`).join('')||'<p>Aucune note.</p>';
+}
+
+$('#category-filter').onchange=e=>{state.categoryId=e.target.value;renderFilters();renderGrid()};
+$('#list-filter').onchange=e=>{state.listId=e.target.value;renderGrid()};
+$('#status-filter').onchange=renderGrid;$('#search').oninput=renderGrid;
+$('#grid').onclick=e=>{const id=e.target.closest('[data-entry]')?.dataset.entry;if(id)openEntry(id)};
+$('#ed-close').onclick=closeEditor;$('#ed-prev').onclick=()=>navigate(-1);$('#ed-next').onclick=()=>navigate(1);
+$('#ed-save').onclick=saveWithFeedback;$('#save').onclick=saveWithFeedback;
+document.querySelectorAll('#f-number,#f-name,#f-title,#f-subtitle,#f-description,#f-extra,#f-wiki,#f-status,#f-locked').forEach(control=>control.oninput=syncFields);
+$('#dynamic-fields').oninput=syncFields;
+$('#img-minus').onclick=()=>state.editor.zoom(1/1.15);$('#img-plus').onclick=()=>state.editor.zoom(1.15);$('#img-fill').onclick=()=>state.editor.fill();$('#img-contain').onclick=()=>state.editor.contain();
+$('#img-file').onclick=()=>$('#img-input').click();$('#img-input').onchange=e=>loadFile(e.target.files[0]);
+$('#image-frame').ondragover=e=>e.preventDefault();$('#image-frame').ondrop=e=>{e.preventDefault();loadFile(e.dataTransfer.files[0])};
+window.addEventListener('paste',e=>{if($('#editeur').hidden)return;const file=[...e.clipboardData.items].find(i=>i.type.startsWith('image/'))?.getAsFile();if(file)loadFile(file)});
+$('#add-row').onclick=()=>{const entries=listEntries(),entry={id:crypto.randomUUID(),listId:state.listId,number:String(entries.length+1),name:'Nouvelle entrée',title:'Nouvelle entrée',subtitle:'',description:'',extraText:'',wikipedia:'',fields:{},order:entries.length,deletedAt:null,externalIds:{},image:{source:null,full:null,thumb:null,crop:{cx:.5,cy:.5,w:1},status:'manquante',locked:false,provenance:{}}};state.data.entries.push(entry);markDirty();openEntry(entry.id)};
+$('#duplicate-row').onclick=()=>{const source=state.data.entries.find(e=>e.id===state.entryId);if(!source)return;const copy=structuredClone(source);copy.id=crypto.randomUUID();copy.name+=` (copie)`;copy.number=String(listEntries().length+1);copy.order=listEntries().length;copy.image.locked=false;state.data.entries.push(copy);markDirty();openEntry(copy.id)};
+$('#trash-row').onclick=()=>{const entry=state.data.entries.find(e=>e.id===state.entryId);if(entry&&confirm(`Supprimer « ${entry.name} » ?`)){entry.deletedAt=new Date().toISOString();state.data.trash.push({type:'entry',id:entry.id,at:entry.deletedAt});markDirty();closeEditor()}};
+$('#renumber').onclick=()=>{const start=Number(prompt('Premier numéro',1));if(!start)return;listEntries().forEach((e,i)=>e.number=String(start+i));markDirty();renderGrid()};
+$('#notes-view').onclick=()=>{renderNotes();$('#notes-dialog').showModal()};$('#bulk-note').onclick=$('#entry-note').onclick=()=>{renderNotes();$('#notes-dialog').showModal()};
+$('#note-add').onclick=()=>{const text=$('#note-text').value.trim();if(!text)return;state.data.notes.push({id:crypto.randomUUID(),text,targets:{entryIds:state.entryId?[state.entryId]:[],listIds:state.entryId?[]:[state.listId]},createdAt:new Date().toISOString(),updatedAt:new Date().toISOString(),status:$('#note-status').value,priority:$('#note-priority').value});$('#note-text').value='';markDirty();renderNotes()};
+document.querySelectorAll('[data-close]').forEach(button=>button.onclick=()=>button.closest('dialog').close());
+$('#github-settings').onclick=()=>{$('#github-token').value=token();$('#github-dialog').showModal()};
+$('#github-connect').onclick=async()=>{const value=$('#github-token').value.trim();sessionStorage.setItem('memoGithubToken',value);const response=await fetch(API,{headers:headers()});if(!response.ok){sessionStorage.removeItem('memoGithubToken');return alert('Jeton refusé ou accès insuffisant.')}$('#github-dialog').close();status('GitHub connecté')};
+window.addEventListener('beforeunload',event=>{if(state.dirty||state.imageDirty){event.preventDefault();event.returnValue=''}});
+
+load();
