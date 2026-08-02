@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "revision": 12,
-  "updatedAt": "2026-08-02T20:16:57.564Z",
+  "revision": 13,
+  "updatedAt": "2026-08-02T20:17:31.904Z",
   "imageFormat": {
     "ratio": 1.3333333333333333,
     "full": [
@@ -1191,19 +1191,19 @@
       "deletedAt": null,
       "externalIds": {},
       "image": {
-        "source": "full/chefs_etat/10.webp",
+        "source": "originaux/chefs_etat/10.webp",
         "full": "full/chefs_etat/10.webp",
         "thumb": "thumbs/chefs_etat/10.webp",
         "crop": {
-          "cx": 0.5,
+          "cx": 0.4961789170083679,
           "cy": 0.5,
-          "w": 1
+          "w": 0.7300032647730983
         },
-        "status": "a_verifier",
+        "status": "validee",
         "locked": false,
         "provenance": {
-          "kind": "legacy",
-          "value": "thumbs/chefs_etat/10.webp"
+          "kind": "manuel",
+          "at": "2026-08-02T20:17:31.181Z"
         }
       }
     },
