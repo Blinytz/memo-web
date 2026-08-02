@@ -6,14 +6,14 @@
 // Seule la couche d'enregistrement change : ici il n'y a pas de serveur Node,
 // on écrit directement dans le dépôt Blinytz/memo-web par l'API GitHub.
 
-import { Editeur, FORMAT } from './image-editor.js?v=20260802c';
+import { Editeur, FORMAT } from './image-editor.js?v=20260802d';
 import { lireMemo, ecrireMemo, poserImage, cheminsDe, cleDeEntree, clesPrises }
-  from './memo-html.js?v=20260802c';
+  from './memo-html.js?v=20260802d';
 
 // Affichée dans l'onglet ⚙. À changer en même temps que les « ?v= » de
 // atelier.html : sans ça, le navigateur et le service worker resservent une
 // version précédente à la même adresse, et on croit corriger dans le vide.
-const VERSION = '20260802c';
+const VERSION = '20260802d';
 
 const REPO = 'Blinytz/memo-web', BRANCHE = 'main';
 const API = `https://api.github.com/repos/${REPO}`;
@@ -461,7 +461,10 @@ const texteEnBase64 = t => btoa(unescape(encodeURIComponent(t)));
 // Un seul commit pour tous les fichiers : l'arbre est construit d'abord, la
 // référence n'avance qu'à la fin. Un échec en cours de route ne laisse donc
 // jamais le dépôt à moitié écrit.
-async function commiterGithub(fichiers, messageCommit) {
+// `surProgres` reçoit l'avancement. Indispensable : l'éditeur est en position
+// fixe et couvre l'en-tête, donc le message d'état y devient invisible. Sans
+// retour visible, un envoi de plusieurs Mo passe pour un bouton qui ne fait rien.
+async function commiterGithub(fichiers, messageCommit, surProgres = () => {}) {
   if (!jeton()) {
     // l'éditeur couvre tout l'écran : sans le fermer, l'onglet ⚙ s'ouvrirait
     // derrière lui et le message resterait sans suite visible
@@ -475,7 +478,8 @@ async function commiterGithub(fichiers, messageCommit) {
   const commitParent = await (await fetch(`${API}/git/commits/${parent}`, { headers: entetesGithub() })).json();
 
   const arbre = [];
-  for (const f of fichiers) {
+  for (const [i, f] of fichiers.entries()) {
+    surProgres(`envoi ${i + 1}/${fichiers.length}`);
     const rBlob = await fetch(`${API}/git/blobs`, {
       method: 'POST',
       headers: { ...entetesGithub(), 'Content-Type': 'application/json' },
@@ -485,6 +489,7 @@ async function commiterGithub(fichiers, messageCommit) {
     arbre.push({ path: f.chemin, mode: '100644', type: 'blob', sha: (await rBlob.json()).sha });
   }
 
+  surProgres('publication');
   const rArbre = await fetch(`${API}/git/trees`, {
     method: 'POST',
     headers: { ...entetesGithub(), 'Content-Type': 'application/json' },
@@ -545,8 +550,12 @@ async function enregistrerImage() {
   if (!editeur.source) return alert('Charge d’abord une image (🔄 Remplacer).');
   if (e.image?.locked && !confirm('Cette image est verrouillée. La remplacer quand même ?')) return;
   const bouton = $('#ed-enregistrer');
+  const etiquette = bouton.textContent;
+  const avancement = t => { bouton.textContent = `⏳ ${t}…`; };
   bouton.disabled = true;
+  avancement('préparation');
   message('enregistrement de l’image…');
+  let commite = false;
   try {
     const sorties = await editeur.exporter();
     const liste = listeParId(e.listId);
@@ -590,7 +599,8 @@ async function enregistrerImage() {
     };
     fichiers.push(fichierWorkspace());
 
-    await commiterGithub(fichiers, `Atelier Mémo : ${e.name}`);
+    await commiterGithub(fichiers, `Atelier Mémo : ${e.name}`, avancement);
+    commite = true;   // à partir d'ici, l'enregistrement est acquis
     apercus[e.id] = URL.createObjectURL(sorties.thumb);
     etat.modifie = false;
     message(dansApplication ? 'image enregistrée dans Mémo' : 'image enregistrée (liste hors application)');
@@ -600,9 +610,20 @@ async function enregistrerImage() {
     }
     fermerEditeur();
   } catch (err) {
-    message('erreur');
-    alert('Échec : ' + err.message);
+    // ne jamais annoncer un échec d'enregistrement pour une erreur survenue
+    // après le commit : l'image EST publiée, seul l'affichage a trébuché
+    if (commite) {
+      message('image enregistrée · affichage à rafraîchir');
+      alert('L’image est bien enregistrée. Seul le rafraîchissement de '
+          + 'l’affichage a échoué :\n' + err.message);
+      $('#editeur').hidden = true;
+      etat.entreeCourante = null;
+    } else {
+      message('erreur');
+      alert('Échec : ' + err.message);
+    }
   } finally {
+    bouton.textContent = etiquette;
     bouton.disabled = false;
   }
 }
