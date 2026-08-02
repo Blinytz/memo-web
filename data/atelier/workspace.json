@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "revision": 159,
-  "updatedAt": "2026-08-02T21:33:54.427Z",
+  "revision": 160,
+  "updatedAt": "2026-08-02T21:34:01.918Z",
   "imageFormat": {
     "ratio": 1.3333333333333333,
     "full": [
@@ -44529,19 +44529,19 @@
       "deletedAt": null,
       "externalIds": {},
       "image": {
-        "source": "full/philosophes/31.webp",
+        "source": "originaux/philosophes/31.webp",
         "full": "full/philosophes/31.webp",
         "thumb": "thumbs/philosophes/31.webp",
         "crop": {
-          "cx": 0.5,
-          "cy": 0.5,
-          "w": 1
+          "cx": 0.5081897391713878,
+          "cy": 0.37744602249623393,
+          "w": 0.5644739300537772
         },
-        "status": "a_verifier",
+        "status": "validee",
         "locked": false,
         "provenance": {
-          "kind": "legacy",
-          "value": "thumbs/philosophes/31.webp"
+          "kind": "recadrage",
+          "at": "2026-08-02T21:34:01.094Z"
         }
       }
     },
