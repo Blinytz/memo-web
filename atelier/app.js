@@ -206,7 +206,7 @@ function rendreGrille() {
       const entree = etat.data.entries.find(e => e.id === pastille.dataset.statut);
       const suite = { validee: 'a_verifier', a_verifier: 'validee' };
       modifier(() => { entree.image.status = suite[statutDe(entree)] || 'a_verifier'; });
-      rendreGrille();
+      rafraichirVignette(entree.id);   // pas toute la grille : on ne perd pas sa place
       return;
     }
     const v = ev.target.closest('.vignette');
@@ -371,10 +371,29 @@ function naviguer(pas) {
   if (cible) ouvrirEditeur(cible.id);
 }
 
+// Comme dans l'atelier WikiDeck : on masque, on ne reconstruit pas. Reconstruire
+// la grille remplacerait les 2131 vignettes et renverrait en haut de page, alors
+// qu'on veut retrouver exactement l'endroit qu'on était en train de traiter.
 function fermerEditeur() {
+  const id = etat.entreeCourante;
   $('#editeur').hidden = true;
   etat.entreeCourante = null;
-  rendreGrille();
+  if (id) {
+    rafraichirVignette(id);
+    document.querySelector(`.vignette[data-id="${CSS.escape(id)}"]`)
+      ?.scrollIntoView({ block: 'center' });
+  }
+}
+
+// Met à jour une seule vignette sur place : image, pastille de statut, verrou et
+// nom. Évite de rejouer toute la grille pour une seule entrée modifiée.
+function rafraichirVignette(id) {
+  const noeud = document.querySelector(`.vignette[data-id="${CSS.escape(id)}"]`);
+  const entree = etat.data.entries.find(e => e.id === id);
+  if (!noeud || !entree) return;
+  const provisoire = document.createElement('div');
+  provisoire.innerHTML = vignette(entree);
+  noeud.replaceWith(provisoire.firstElementChild);
 }
 
 function modaleRemplacement() {
@@ -438,7 +457,13 @@ const texteEnBase64 = t => btoa(unescape(encodeURIComponent(t)));
 // référence n'avance qu'à la fin. Un échec en cours de route ne laisse donc
 // jamais le dépôt à moitié écrit.
 async function commiterGithub(fichiers, messageCommit) {
-  if (!jeton()) { afficherConfig(); throw new Error('Connecte GitHub (onglet ⚙) pour enregistrer.'); }
+  if (!jeton()) {
+    // l'éditeur couvre tout l'écran : sans le fermer, l'onglet ⚙ s'ouvrirait
+    // derrière lui et le message resterait sans suite visible
+    fermerEditeur();
+    afficherConfig();
+    throw new Error('Connecte GitHub (onglet ⚙) pour enregistrer.');
+  }
   const rRef = await fetch(`${API}/git/ref/heads/${BRANCHE}`, { headers: entetesGithub(), cache: 'no-store' });
   if (!rRef.ok) throw new Error(`connexion GitHub refusée (${rRef.status})`);
   const parent = (await rRef.json()).object.sha;
