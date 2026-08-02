@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "revision": 111,
-  "updatedAt": "2026-08-02T21:17:40.054Z",
+  "revision": 112,
+  "updatedAt": "2026-08-02T21:18:14.626Z",
   "imageFormat": {
     "ratio": 1.3333333333333333,
     "full": [
@@ -31168,19 +31168,19 @@
       "deletedAt": null,
       "externalIds": {},
       "image": {
-        "source": "full/rois_france/52.webp",
+        "source": "originaux/rois_france/52.webp",
         "full": "full/rois_france/52.webp",
         "thumb": "thumbs/rois_france/52.webp",
         "crop": {
           "cx": 0.5,
-          "cy": 0.5,
+          "cy": 0.3740188810043037,
           "w": 1
         },
-        "status": "a_verifier",
+        "status": "validee",
         "locked": false,
         "provenance": {
-          "kind": "legacy",
-          "value": "thumbs/rois_france/52.webp"
+          "kind": "manuel",
+          "at": "2026-08-02T21:18:13.866Z"
         }
       }
     },
