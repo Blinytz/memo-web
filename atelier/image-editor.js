@@ -18,7 +18,12 @@
 // grande image : un seul geste, deux fichiers cohérents.
 
 export const FORMAT = Object.freeze({
-  full: Object.freeze([800, 600]),    // grande image de Mémo
+  // 2000 × 1500 : le zoom de Mémo s'affiche dans un cadre de 420 px de haut,
+  // soit 1680 px sur un écran à très haute densité — au-delà, les octets
+  // n'achètent plus rien de visible. C'est aussi la taille à laquelle les
+  // grandes images d'archive ont été converties : sans ça, le zoom serait net
+  // ou flou selon la date du recadrage.
+  full: Object.freeze([2000, 1500]),  // grande image de Mémo
   thumb: Object.freeze([400, 300]),   // miniature de Mémo (son format d'origine)
   originalMax: 2400,
   ratio: 4 / 3,
@@ -134,7 +139,7 @@ export async function rendreDepuisCadrage(url, cadrage) {
     return new Promise(ok => c.toBlob(ok, 'image/webp', 0.92));
   };
   return {
-    full: await versBlob(FORMAT.full, 0.9),
+    full: await versBlob(FORMAT.full, 0.92),
     thumb: await versBlob(FORMAT.thumb, 0.85),
     original: await original(),
     cadrage: { cx: (x + w / 2) / iw, cy: (y + h / 2) / ih, w: w / iw },
@@ -353,7 +358,7 @@ export class Editeur {
   async exporter() {
     if (!this.source) throw new Error('aucune image chargée');
     return {
-      full: await this._rendu(FORMAT.full, 0.9),
+      full: await this._rendu(FORMAT.full, 0.92),
       thumb: await this._rendu(FORMAT.thumb, 0.85),
       original: await this._original(),
     };
