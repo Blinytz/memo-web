@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "revision": 121,
-  "updatedAt": "2026-08-02T21:19:35.597Z",
+  "revision": 122,
+  "updatedAt": "2026-08-02T21:19:45.108Z",
   "imageFormat": {
     "ratio": 1.3333333333333333,
     "full": [
@@ -31624,19 +31624,19 @@
       "deletedAt": null,
       "externalIds": {},
       "image": {
-        "source": "full/rois_france/64.webp",
+        "source": "originaux/rois_france/64.webp",
         "full": "full/rois_france/64.webp",
         "thumb": "thumbs/rois_france/64.webp",
         "crop": {
           "cx": 0.5,
-          "cy": 0.5,
+          "cy": 0.40931854248046873,
           "w": 1
         },
-        "status": "a_verifier",
+        "status": "validee",
         "locked": false,
         "provenance": {
-          "kind": "legacy",
-          "value": "thumbs/rois_france/64.webp"
+          "kind": "recadrage",
+          "at": "2026-08-02T21:19:37.778Z"
         }
       }
     },
@@ -31662,19 +31662,19 @@
       "deletedAt": null,
       "externalIds": {},
       "image": {
-        "source": "full/rois_france/65.webp",
+        "source": "originaux/rois_france/65.webp",
         "full": "full/rois_france/65.webp",
         "thumb": "thumbs/rois_france/65.webp",
         "crop": {
           "cx": 0.5,
-          "cy": 0.5,
+          "cy": 0.3880367143154144,
           "w": 1
         },
-        "status": "a_verifier",
+        "status": "validee",
         "locked": false,
         "provenance": {
-          "kind": "legacy",
-          "value": "thumbs/rois_france/65.webp"
+          "kind": "recadrage",
+          "at": "2026-08-02T21:19:41.562Z"
         }
       }
     },
