@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "revision": 169,
-  "updatedAt": "2026-08-02T21:36:19.644Z",
+  "revision": 170,
+  "updatedAt": "2026-08-02T21:36:45.018Z",
   "imageFormat": {
     "ratio": 1.3333333333333333,
     "full": [
@@ -44929,19 +44929,19 @@
       "deletedAt": null,
       "externalIds": {},
       "image": {
-        "source": "full/philosophes/41.webp",
+        "source": "originaux/philosophes/41.webp",
         "full": "full/philosophes/41.webp",
         "thumb": "thumbs/philosophes/41.webp",
         "crop": {
-          "cx": 0.5,
-          "cy": 0.5,
-          "w": 1
+          "cx": 0.5098080151542601,
+          "cy": 0.4015591660372707,
+          "w": 0.6678353785791801
         },
-        "status": "a_verifier",
+        "status": "validee",
         "locked": false,
         "provenance": {
-          "kind": "legacy",
-          "value": "thumbs/philosophes/41.webp"
+          "kind": "manuel",
+          "at": "2026-08-02T21:36:44.276Z"
         }
       }
     },
