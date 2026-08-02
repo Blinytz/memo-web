@@ -6,14 +6,14 @@
 // Seule la couche d'enregistrement change : ici il n'y a pas de serveur Node,
 // on écrit directement dans le dépôt Blinytz/memo-web par l'API GitHub.
 
-import { Editeur, FORMAT } from './image-editor.js?v=20260802d';
+import { Editeur, FORMAT } from './image-editor.js?v=20260802f';
 import { lireMemo, ecrireMemo, poserImage, cheminsDe, cleDeEntree, clesPrises }
-  from './memo-html.js?v=20260802d';
+  from './memo-html.js?v=20260802f';
 
 // Affichée dans l'onglet ⚙. À changer en même temps que les « ?v= » de
 // atelier.html : sans ça, le navigateur et le service worker resservent une
 // version précédente à la même adresse, et on croit corriger dans le vide.
-const VERSION = '20260802d';
+const VERSION = '20260802f';
 
 const REPO = 'Blinytz/memo-web', BRANCHE = 'main';
 const API = `https://api.github.com/repos/${REPO}`;
@@ -52,6 +52,66 @@ const etat = {
 // aperçus des images enregistrées pendant la session : la grille les montre
 // tout de suite, sans attendre que GitHub Pages ait republié le fichier
 const apercus = {};
+// même chose pour la source pleine résolution, que l'éditeur rechargera si on
+// rouvre l'entrée avant la republication
+const apercusSource = {};
+
+/* ---------- file d'envoi ----------
+   Reprise de wikideck/atelier/github.js. Le travail ne doit jamais attendre le
+   réseau : on enregistre, on continue, et les envois se font en arrière-plan,
+   un à la fois pour ne pas empiler les commits concurrents. Trois tentatives,
+   puis on garde l'échec visible dans le badge plutôt que de l'oublier. */
+const file = [];
+let envoiEnCours = false;
+
+function majBadge() {
+  const el = $('#badge-envoi');
+  const enErreur = file.filter(j => j.erreur).length;
+  // le travail en cours reste dans la file jusqu'à son succès : le compter
+  // une seconde fois afficherait « 2 » pour un seul envoi
+  const restants = file.filter(j => !j.erreur).length;
+  el.classList.toggle('erreur', enErreur > 0);
+  if (enErreur) {
+    el.hidden = false;
+    el.textContent = `⚠ ${enErreur} envoi(s) échoué(s) — cliquer pour réessayer`;
+  } else if (restants) {
+    el.hidden = false;
+    el.textContent = `⏳ envoi… (${restants})`;
+  } else {
+    el.hidden = true;
+    message('tout est enregistré');
+  }
+}
+
+function enfiler(label, run, entryId = null) {
+  file.push({ label, run, entryId, essais: 0, erreur: false });
+  majBadge();
+  pomper();
+}
+
+async function pomper() {
+  if (envoiEnCours) return;
+  const job = file.find(j => !j.erreur);
+  if (!job) { majBadge(); return; }
+  envoiEnCours = true;
+  majBadge();
+  try {
+    await job.run();
+    file.splice(file.indexOf(job), 1);
+  } catch (err) {
+    job.essais += 1;
+    if (job.essais >= 3) {
+      job.erreur = true;
+      job.message = err.message;
+      console.error(`Échec définitif « ${job.label} » :`, err);
+    } else {
+      await new Promise(r => setTimeout(r, 1500 * job.essais));
+    }
+  }
+  envoiEnCours = false;
+  majBadge();
+  if (file.some(j => !j.erreur)) pomper();
+}
 let editeur = null;
 let remplacementEnCours = false;
 
@@ -71,8 +131,19 @@ async function demarrer() {
   }
   rendreTout();
   message(jeton() ? 'GitHub connecté' : 'lecture seule');
+  // quitter pendant qu'un envoi est en file perdrait l'image pour de bon :
+  // elle n'existe alors que dans cet onglet
   window.addEventListener('beforeunload', ev => {
-    if (etat.modifie) { ev.preventDefault(); ev.returnValue = ''; }
+    if (etat.modifie || file.length || envoiEnCours) {
+      ev.preventDefault();
+      ev.returnValue = 'Des envois sont en cours — quitter perdrait des modifications.';
+    }
+  });
+  $('#badge-envoi').addEventListener('click', () => {
+    if (!file.some(j => j.erreur)) return;
+    for (const j of file) { j.erreur = false; j.essais = 0; }
+    majBadge();
+    pomper();
   });
 }
 
@@ -354,7 +425,9 @@ async function ouvrirEditeur(entryId) {
   $('#ed-vide').textContent = 'Aucune image — colle une URL, une image (Ctrl+V) ou choisis un fichier.';
 
   const bust = `?v=${Date.now()}`;
-  const sources = [e.image?.source, e.image?.full, e.image?.thumb]
+  // l'aperçu de session passe devant : rouvrir une entrée juste enregistrée
+  // doit montrer ce qu'on vient de faire, pas la version encore en ligne
+  const sources = [apercusSource[e.id], e.image?.source, e.image?.full, e.image?.thumb]
     .filter(Boolean).map(p => urlImage(p) + bust);
   if (!sources.length) { majMesures(); return; }
   try {
@@ -544,49 +617,37 @@ async function enregistrerAvecRetour() {
   }
 }
 
+// L'enregistrement ne fait plus attendre le réseau, comme dans l'atelier
+// WikiDeck : on découpe les images, on met la grille à jour avec un aperçu
+// local, on referme, et l'envoi part en file d'attente. GitHub Pages mettra
+// une minute ou deux à republier — ça n'a pas à bloquer le travail en cours.
 async function enregistrerImage() {
   const e = entreeCourante();
   if (!e) return;
   if (!editeur.source) return alert('Charge d’abord une image (🔄 Remplacer).');
+  if (!jeton()) { fermerEditeur(); afficherConfig(); return alert('Connecte GitHub (onglet ⚙) pour enregistrer.'); }
   if (e.image?.locked && !confirm('Cette image est verrouillée. La remplacer quand même ?')) return;
+
   const bouton = $('#ed-enregistrer');
   const etiquette = bouton.textContent;
-  const avancement = t => { bouton.textContent = `⏳ ${t}…`; };
   bouton.disabled = true;
-  avancement('préparation');
-  message('enregistrement de l’image…');
-  let commite = false;
+  bouton.textContent = '⏳ découpage…';
   try {
     const sorties = await editeur.exporter();
     const liste = listeParId(e.listId);
-
-    // memo.html est l'application : c'est lui qui décide quelles images
-    // s'affichent. On part de la version réellement dans le dépôt.
-    const memo = lireMemo(await lireFichierDepot('memo.html'));
-    const dansApplication = memo.idsListes.has(liste?.legacyId);
-
-    // La clé de fichier suit la convention de memo.html : « thumbs/<liste>/<clé> ».
+    // les chemins sont déterministes : pas besoin de lire memo.html pour les
+    // connaître, seulement pour y inscrire l'image — ce que fera l'envoi
     const voisines = etat.data.entries
       .filter(x => x.listId === e.listId && !x.deletedAt && x.id !== e.id);
     const cle = cleDeEntree(e, clesPrises(voisines));
+    const idListe = liste?.legacyId || 'divers';
+    const chemins = cheminsDe(idListe, cle);
 
-    let cheminMemoHtml = null;
-    let chemins;
-    if (dansApplication) {
-      chemins = poserImage(memo, liste.legacyId, e.order, cle);
-      cheminMemoHtml = ecrireMemo(memo);
-    } else {
-      // liste absente de l'application : on dépose quand même les fichiers,
-      // prêts à servir, mais on ne prétend pas avoir mis l'application à jour
-      chemins = cheminsDe(liste?.legacyId || 'divers', cle);
-    }
-
-    const fichiers = [
-      { chemin: chemins.original, base64: await blobEnBase64(sorties.original) },
-      { chemin: chemins.full, base64: await blobEnBase64(sorties.full) },
-      { chemin: chemins.thumb, base64: await blobEnBase64(sorties.thumb) },
-    ];
-    if (cheminMemoHtml) fichiers.push({ chemin: 'memo.html', texte: cheminMemoHtml });
+    // aperçus de session : la grille et l'éditeur les préfèrent aux fichiers du
+    // dépôt tant que la republication n'a pas eu lieu — et même si l'envoi
+    // échoue, on ne se retrouve donc jamais devant l'ancienne image
+    apercus[e.id] = URL.createObjectURL(sorties.thumb);
+    apercusSource[e.id] = URL.createObjectURL(sorties.original);
 
     e.image.source = chemins.original;
     e.image.full = chemins.full;
@@ -597,31 +658,42 @@ async function enregistrerImage() {
       kind: remplacementEnCours ? 'manuel' : 'recadrage',
       at: new Date().toISOString(),
     };
-    fichiers.push(fichierWorkspace());
 
-    await commiterGithub(fichiers, `Atelier Mémo : ${e.name}`, avancement);
-    commite = true;   // à partir d'ici, l'enregistrement est acquis
-    apercus[e.id] = URL.createObjectURL(sorties.thumb);
-    etat.modifie = false;
-    message(dansApplication ? 'image enregistrée dans Mémo' : 'image enregistrée (liste hors application)');
-    if (!dansApplication) {
-      alert('Les fichiers sont écrits, mais memo.html ne contient pas cette liste :\n' +
-            'l’application n’affichera pas encore cette image.');
-    }
-    fermerEditeur();
+    const nom = e.name, entryId = e.id;
+    const donnees = {
+      original: await blobEnBase64(sorties.original),
+      full: await blobEnBase64(sorties.full),
+      thumb: await blobEnBase64(sorties.thumb),
+    };
+
+    fermerEditeur();          // la main est rendue tout de suite
+    message('envoi en arrière-plan');
+
+    enfiler(`image ${nom}`, async () => {
+      // memo.html est relu au moment de l'envoi : si plusieurs images se
+      // suivent, chacune part d'une version à jour au lieu d'écraser la
+      // précédente
+      const memo = lireMemo(await lireFichierDepot('memo.html'));
+      const dansApplication = memo.idsListes.has(idListe);
+      const fichiers = [
+        { chemin: chemins.original, base64: donnees.original },
+        { chemin: chemins.full, base64: donnees.full },
+        { chemin: chemins.thumb, base64: donnees.thumb },
+      ];
+      if (dansApplication) {
+        poserImage(memo, idListe, e.order, cle);
+        fichiers.push({ chemin: 'memo.html', texte: ecrireMemo(memo) });
+      }
+      fichiers.push(fichierWorkspace());
+      await commiterGithub(fichiers, `Atelier Mémo : ${nom}`);
+      etat.modifie = false;
+      if (!dansApplication) {
+        console.warn(`liste ${idListe} absente de memo.html : image écrite mais non affichée`);
+      }
+    }, entryId);
   } catch (err) {
-    // ne jamais annoncer un échec d'enregistrement pour une erreur survenue
-    // après le commit : l'image EST publiée, seul l'affichage a trébuché
-    if (commite) {
-      message('image enregistrée · affichage à rafraîchir');
-      alert('L’image est bien enregistrée. Seul le rafraîchissement de '
-          + 'l’affichage a échoué :\n' + err.message);
-      $('#editeur').hidden = true;
-      etat.entreeCourante = null;
-    } else {
-      message('erreur');
-      alert('Échec : ' + err.message);
-    }
+    message('erreur');
+    alert('Échec : ' + err.message);
   } finally {
     bouton.textContent = etiquette;
     bouton.disabled = false;

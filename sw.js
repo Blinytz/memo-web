@@ -1,4 +1,4 @@
-﻿const CACHE = 'memo-v87';
+﻿const CACHE = 'memo-v89';
 const PRECACHE = ['./memo.html', './manifest.json'];
 
 self.addEventListener('install', e => {
