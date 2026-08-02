@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "revision": 135,
-  "updatedAt": "2026-08-02T21:25:43.099Z",
+  "revision": 136,
+  "updatedAt": "2026-08-02T21:26:47.792Z",
   "imageFormat": {
     "ratio": 1.3333333333333333,
     "full": [
@@ -43569,19 +43569,19 @@
       "deletedAt": null,
       "externalIds": {},
       "image": {
-        "source": "full/philosophes/7.webp",
+        "source": "originaux/philosophes/7.webp",
         "full": "full/philosophes/7.webp",
         "thumb": "thumbs/philosophes/7.webp",
         "crop": {
-          "cx": 0.5,
+          "cx": 0.4581525264642177,
           "cy": 0.5,
-          "w": 1
+          "w": 0.7495069033530573
         },
-        "status": "a_verifier",
+        "status": "validee",
         "locked": false,
         "provenance": {
-          "kind": "legacy",
-          "value": "thumbs/philosophes/7.webp"
+          "kind": "manuel",
+          "at": "2026-08-02T21:26:46.712Z"
         }
       }
     },
