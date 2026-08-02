@@ -6,14 +6,14 @@
 // Seule la couche d'enregistrement change : ici il n'y a pas de serveur Node,
 // on écrit directement dans le dépôt Blinytz/memo-web par l'API GitHub.
 
-import { Editeur, FORMAT } from './image-editor.js?v=20260802f';
+import { Editeur, FORMAT } from './image-editor.js?v=20260802g';
 import { lireMemo, ecrireMemo, poserImage, cheminsDe, cleDeEntree, clesPrises }
-  from './memo-html.js?v=20260802f';
+  from './memo-html.js?v=20260802g';
 
 // Affichée dans l'onglet ⚙. À changer en même temps que les « ?v= » de
 // atelier.html : sans ça, le navigateur et le service worker resservent une
 // version précédente à la même adresse, et on croit corriger dans le vide.
-const VERSION = '20260802f';
+const VERSION = '20260802g';
 
 const REPO = 'Blinytz/memo-web', BRANCHE = 'main';
 const API = `https://api.github.com/repos/${REPO}`;
@@ -313,6 +313,22 @@ function brancherEditeur() {
     `<option value="${s}">${s.replaceAll('_', ' ')}</option>`).join('');
 
   $('#ed-fermer').addEventListener('click', fermerEditeur);
+  // copier le nom pour aller chercher une image dans un navigateur
+  $('#ed-copier').addEventListener('click', async () => {
+    const e = entreeCourante();
+    if (!e) return;
+    const b = $('#ed-copier');
+    try {
+      await navigator.clipboard.writeText(e.name);
+      b.textContent = '✓';
+    } catch {
+      // le presse-papiers peut être refusé (page non sécurisée, permission) :
+      // on sélectionne le nom pour que Ctrl+C reste possible
+      getSelection().selectAllChildren($('#ed-nom'));
+      b.textContent = '⌨';
+    }
+    setTimeout(() => { b.textContent = '📋'; }, 1200);
+  });
   $('#ed-plus').addEventListener('click', () => editeur.zoomer(1.2));
   $('#ed-moins').addEventListener('click', () => editeur.zoomer(1 / 1.2));
   $('#ed-reset').addEventListener('click', () => editeur.recadrerAuto());

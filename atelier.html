@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#12121c">
 <title>Atelier Mémo</title>
 <link rel="icon" href="icon-192.png">
-<link rel="stylesheet" href="atelier/style.css?v=20260802f">
+<link rel="stylesheet" href="atelier/style.css?v=20260802g">
 </head>
 <body>
 
@@ -64,7 +64,10 @@
     <button class="btn btn-discret" id="ed-fermer">✕ Fermer</button>
     <button class="btn nav-card" id="ed-precedent" title="Entrée précédente">←</button>
     <div class="ed-titre">
-      <b id="ed-nom"></b>
+      <span class="ed-nom-rangee">
+        <b id="ed-nom"></b>
+        <button id="ed-copier" class="btn-copier" title="Copier le nom pour le chercher dans un navigateur">📋</button>
+      </span>
       <small id="ed-infos"></small>
     </div>
     <button class="btn nav-card" id="ed-suivant" title="Entrée suivante">→</button>
@@ -121,6 +124,6 @@
 
 <div id="modale" class="modale" hidden><div class="modale-boite" id="modale-boite"></div></div>
 
-<script type="module" src="atelier/app.js?v=20260802f"></script>
+<script type="module" src="atelier/app.js?v=20260802g"></script>
 </body>
 </html>

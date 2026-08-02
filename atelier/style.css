@@ -112,7 +112,13 @@ td img { width: 60px; aspect-ratio: 4/3; object-fit: cover; border-radius: 5px;
 .editeur-entete { display: flex; gap: 10px; align-items: center; padding: 10px 14px;
   position: sticky; top: 0; z-index: 5; background: #0b0b12f0; backdrop-filter: blur(8px); }
 .ed-titre { flex: 1; min-width: 0; }
+.ed-nom-rangee { display: flex; align-items: center; gap: 8px; min-width: 0; }
 .ed-titre b { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* repris tel quel de wikideck/atelier/atelier.css */
+.btn-copier { background: none; border: 1px solid #ffffff25; border-radius: 7px;
+  color: var(--texte); cursor: pointer; font-size: 13px; padding: 3px 7px;
+  flex-shrink: 0; }
+.btn-copier:hover { border-color: var(--accent-2); }
 .ed-titre small { display: block; color: var(--doux); font-size: 11px;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .nav-card { font-size: 17px; padding: 7px 13px; }
