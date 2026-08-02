@@ -6,14 +6,14 @@
 // Seule la couche d'enregistrement change : ici il n'y a pas de serveur Node,
 // on écrit directement dans le dépôt Blinytz/memo-web par l'API GitHub.
 
-import { Editeur, FORMAT } from './image-editor.js?v=20260802g';
+import { Editeur, FORMAT } from './image-editor.js?v=20260802h';
 import { lireMemo, ecrireMemo, poserImage, cheminsDe, cleDeEntree, clesPrises }
-  from './memo-html.js?v=20260802g';
+  from './memo-html.js?v=20260802h';
 
 // Affichée dans l'onglet ⚙. À changer en même temps que les « ?v= » de
 // atelier.html : sans ça, le navigateur et le service worker resservent une
 // version précédente à la même adresse, et on croit corriger dans le vide.
-const VERSION = '20260802g';
+const VERSION = '20260802h';
 
 const REPO = 'Blinytz/memo-web', BRANCHE = 'main';
 const API = `https://api.github.com/repos/${REPO}`;
@@ -443,8 +443,15 @@ async function ouvrirEditeur(entryId) {
   const bust = `?v=${Date.now()}`;
   // l'aperçu de session passe devant : rouvrir une entrée juste enregistrée
   // doit montrer ce qu'on vient de faire, pas la version encore en ligne
+  // l'anti-cache ne vaut que pour le réseau : collé à un blob: de session, il
+  // rend l'adresse invalide, le chargement échoue, et on retombe sur le fichier
+  // du dépôt — donc sur l'ANCIENNE image, ce qui était tout ce qu'on voulait éviter
+  const adresse = p => {
+    const u = urlImage(p);
+    return /^(blob:|data:)/i.test(u) ? u : u + bust;
+  };
   const sources = [apercusSource[e.id], e.image?.source, e.image?.full, e.image?.thumb]
-    .filter(Boolean).map(p => urlImage(p) + bust);
+    .filter(Boolean).map(adresse);
   if (!sources.length) { majMesures(); return; }
   try {
     await editeur.chargerPremiereDisponible(sources);
