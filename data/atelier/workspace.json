@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "revision": 13,
-  "updatedAt": "2026-08-02T20:17:31.904Z",
+  "revision": 17,
+  "updatedAt": "2026-08-02T20:19:20.143Z",
   "imageFormat": {
     "ratio": 1.3333333333333333,
     "full": [
@@ -1229,19 +1229,19 @@
       "deletedAt": null,
       "externalIds": {},
       "image": {
-        "source": "full/chefs_etat/11.webp",
+        "source": "originaux/chefs_etat/11.webp",
         "full": "full/chefs_etat/11.webp",
         "thumb": "thumbs/chefs_etat/11.webp",
         "crop": {
           "cx": 0.5,
-          "cy": 0.5,
+          "cy": 0.37543195486068726,
           "w": 1
         },
-        "status": "a_verifier",
+        "status": "validee",
         "locked": false,
         "provenance": {
-          "kind": "legacy",
-          "value": "thumbs/chefs_etat/11.webp"
+          "kind": "manuel",
+          "at": "2026-08-02T20:18:17.799Z"
         }
       }
     },
@@ -1267,19 +1267,19 @@
       "deletedAt": null,
       "externalIds": {},
       "image": {
-        "source": "full/chefs_etat/12.webp",
+        "source": "originaux/chefs_etat/12.webp",
         "full": "full/chefs_etat/12.webp",
         "thumb": "thumbs/chefs_etat/12.webp",
         "crop": {
           "cx": 0.5,
-          "cy": 0.5,
+          "cy": 0.3599281179110209,
           "w": 1
         },
-        "status": "a_verifier",
+        "status": "validee",
         "locked": false,
         "provenance": {
-          "kind": "legacy",
-          "value": "thumbs/chefs_etat/12.webp"
+          "kind": "manuel",
+          "at": "2026-08-02T20:19:19.449Z"
         }
       }
     },
