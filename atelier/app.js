@@ -6,9 +6,14 @@
 // Seule la couche d'enregistrement change : ici il n'y a pas de serveur Node,
 // on écrit directement dans le dépôt Blinytz/memo-web par l'API GitHub.
 
-import { Editeur, FORMAT } from './image-editor.js?v=20260802';
+import { Editeur, FORMAT } from './image-editor.js?v=20260802c';
 import { lireMemo, ecrireMemo, poserImage, cheminsDe, cleDeEntree, clesPrises }
-  from './memo-html.js?v=20260802';
+  from './memo-html.js?v=20260802c';
+
+// Affichée dans l'onglet ⚙. À changer en même temps que les « ?v= » de
+// atelier.html : sans ça, le navigateur et le service worker resservent une
+// version précédente à la même adresse, et on croit corriger dans le vide.
+const VERSION = '20260802c';
 
 const REPO = 'Blinytz/memo-web', BRANCHE = 'main';
 const API = `https://api.github.com/repos/${REPO}`;
@@ -805,6 +810,9 @@ function rendreConfig() {
     <div class="panneau">
       <h3>État</h3>
       <p class="doux">
+        <b>Version de l'atelier : ${VERSION}</b><br>
+        (si ce numéro ne correspond pas à celui annoncé, le navigateur sert une
+        version en cache : recharger avec Ctrl+Shift+R)<br><br>
         ${listesVivantes().length} listes · ${total} entrées · ${avec} avec image
         (${total - avec} sans)<br>
         Formats écrits : grande image ${FORMAT.full.join(' × ')},
