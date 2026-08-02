@@ -54,6 +54,9 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Inter'
 .home-toolbar .section-label{margin:0;}
 .home-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:16px;}
 .home-actions .btn{min-width:0;padding:0 10px;letter-spacing:.045em;}
+.header-right{display:flex;align-items:center;gap:10px;}
+#header-atelier{font-size:16px;line-height:1;text-decoration:none;padding:4px;opacity:.75;transition:opacity .15s;}
+#header-atelier:hover{opacity:1;}
 .list-group{margin:0 0 22px;}
 .list-group-head{display:flex;align-items:center;gap:8px;margin-bottom:9px;}
 .list-group-title{font-family:'Syne',sans-serif;font-size:13px;font-weight:800;color:var(--text);}
@@ -230,7 +233,10 @@ td.editable:active{background:var(--surface2);}
 <div id="app">
   <header id="header">
     <span id="header-title">Mémo</span>
-    <span id="header-sub"></span>
+    <span class="header-right">
+      <span id="header-sub"></span>
+      <a id="header-atelier" href="./atelier.html" title="Ouvrir l’Atelier Mémo" aria-label="Ouvrir l’Atelier Mémo">🖼️</a>
+    </span>
   </header>
   <main id="main">
 

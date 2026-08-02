@@ -1,129 +1,126 @@
 <!doctype html>
 <html lang="fr">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#12121c">
-  <title>Atelier Mémo</title>
-  <link rel="stylesheet" href="atelier/style.css?v=20260728-3">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#12121c">
+<title>Atelier Mémo</title>
+<link rel="icon" href="icon-192.png">
+<link rel="stylesheet" href="atelier/style.css?v=20260802">
 </head>
 <body>
+
 <header id="entete">
   <div class="titre">🖼️ Atelier <span>Mémo</span></div>
-  <output id="status">Chargement…</output>
-  <nav>
-    <button id="notes-view">Notes</button>
-    <button id="github-settings" title="Connexion GitHub">⚙</button>
-    <button id="save" class="btn primaire">💾 Enregistrer</button>
+  <div id="badge-envoi" class="badge-envoi" hidden></div>
+  <nav id="onglets">
+    <button data-vue="grille" class="actif">Grille</button>
+    <button data-vue="tableau">Tableau</button>
+    <button data-vue="notes">Notes <span id="nb-notes"></span></button>
+    <button data-vue="config">⚙</button>
   </nav>
+  <button class="btn" id="btn-annuler" title="Annuler">↶</button>
+  <button class="btn" id="btn-refaire" title="Refaire">↷</button>
+  <button class="btn btn-primaire" id="btn-enregistrer">💾 Enregistrer</button>
+  <output id="etat">Chargement…</output>
 </header>
 
-<div class="barre-filtres">
-  <select id="category-filter" aria-label="Catégorie"></select>
-  <select id="list-filter" aria-label="Liste"></select>
-  <select id="status-filter" aria-label="Statut image">
-    <option value="">Toutes les images</option>
-    <option value="a_traiter">À traiter</option>
-    <option value="validee">Validées</option>
-    <option value="verrouillee">Verrouillées</option>
+<div id="barre-filtres" class="barre-filtres">
+  <select id="f-liste"><option value="">Toutes les listes</option></select>
+  <select id="f-statut">
+    <option value="">Tous les statuts</option>
+    <option value="sans">🚫 sans image</option>
+    <option value="a_verifier">⚠ à vérifier</option>
+    <option value="validee">✓ validée</option>
+    <option value="importee">⬇ importée</option>
+    <option value="verrouillee">🔒 verrouillée</option>
   </select>
-  <input id="search" type="search" placeholder="🔎 Rechercher une entrée…">
-  <button id="add-row" class="btn">＋ Nouvelle entrée</button>
+  <input type="search" id="f-texte" placeholder="🔍 nom d'entrée…">
+  <button class="btn" id="btn-nouvelle">➕ Nouvelle entrée</button>
 </div>
 
 <main>
-  <section id="vue-grille">
-    <div class="vue-entete">
-      <div><h1 id="list-title">Liste</h1><p id="metrics"></p></div>
-      <div class="actions-liste">
-        <button id="renumber" class="btn">Renuméroter</button>
-        <button id="bulk-note" class="btn">Note</button>
-      </div>
+  <section id="vue-grille" class="vue visible"><p class="doux">Chargement…</p></section>
+
+  <section id="vue-tableau" class="vue">
+    <div class="barre-outils">
+      <b id="tableau-titre">Liste</b>
+      <span id="tableau-metriques" class="doux"></span>
+      <button class="btn" id="btn-ligne">＋ Ligne</button>
+      <button class="btn" id="btn-dupliquer">Dupliquer</button>
+      <button class="btn" id="btn-corbeille">Corbeille</button>
+      <button class="btn" id="btn-renumeroter">Renuméroter</button>
     </div>
-    <div id="grid" class="grille"></div>
+    <div class="tableau-defile"><table><thead id="thead"></thead><tbody id="tbody"></tbody></table></div>
   </section>
+
+  <section id="vue-notes" class="vue"></section>
+  <section id="vue-config" class="vue"></section>
 </main>
 
-<section id="editeur" class="editeur" hidden>
-  <header class="editeur-entete">
-    <button id="ed-close" class="btn discret">✕ Fermer</button>
-    <button id="ed-prev" class="btn nav-card" aria-label="Entrée précédente">←</button>
-    <div class="ed-titre"><b id="ed-name"></b><small id="ed-info"></small></div>
-    <button id="ed-next" class="btn nav-card" aria-label="Entrée suivante">→</button>
-    <button id="ed-save" class="btn primaire">💾 Enregistrer</button>
-  </header>
+<!-- ---------- éditeur ---------- -->
+<div id="editeur" class="editeur" hidden>
+  <div class="editeur-entete">
+    <button class="btn btn-discret" id="ed-fermer">✕ Fermer</button>
+    <button class="btn nav-card" id="ed-precedent" title="Entrée précédente">←</button>
+    <div class="ed-titre">
+      <b id="ed-nom"></b>
+      <small id="ed-infos"></small>
+    </div>
+    <button class="btn nav-card" id="ed-suivant" title="Entrée suivante">→</button>
+    <button class="btn btn-primaire" id="ed-enregistrer">💾 Enregistrer l'image</button>
+  </div>
 
   <div class="editeur-scene">
-    <div id="image-frame" class="cadre-image">
-      <img id="image-source" alt="" draggable="false">
-      <div class="repere-cadre"></div>
-      <div id="image-empty" class="image-empty" hidden>Déposez, collez ou importez une image</div>
+    <div class="ed-cadre-conteneur" id="ed-conteneur">
+      <div id="ed-vide">Aucune image — colle une URL, une image (Ctrl+V) ou choisis un fichier.</div>
+      <img id="ed-image" alt="" draggable="false">
+      <div class="ed-cadre"></div>
     </div>
   </div>
 
   <div class="editeur-outils">
-    <div class="zoom">
-      <button id="img-minus" class="btn">−</button>
-      <button id="img-plus" class="btn">＋</button>
-      <button id="img-fill" class="btn discret">↺ Recadrer auto</button>
-      <button id="img-contain" class="btn discret">Image entière</button>
+    <div class="ed-zoom">
+      <button class="btn" id="ed-moins">−</button>
+      <button class="btn" id="ed-plus">+</button>
+      <button class="btn btn-discret" id="ed-reset">↺ recadrer auto</button>
     </div>
-    <canvas id="image-preview" width="213" height="160" aria-label="Aperçu"></canvas>
-    <div class="remplacement">
-      <button id="img-file" class="btn">🔄 Remplacer l’image</button>
-      <button id="img-copy" class="btn">📋 Copier le cadrage</button>
-      <input id="img-input" type="file" accept="image/*" hidden>
+    <div class="ed-apercu">
+      <span>Miniature de Mémo <small>400 × 300</small></span>
+      <canvas id="ed-canvas-apercu" width="400" height="300"></canvas>
     </div>
-  </div>
-  <div class="reglages-image">
-    <label>Zoom <input id="img-zoom" type="range" min="100" max="800" value="100"><output id="img-zoom-value">100 %</output></label>
-    <label>Position horizontale <input id="img-x" type="range" min="0" max="100" value="50"></label>
-    <label>Position verticale <input id="img-y" type="range" min="0" max="100" value="50"></label>
-    <label>Étirer horizontalement <input id="img-stretch-x" type="range" min="50" max="200" value="100"><output id="img-stretch-x-value">100 %</output></label>
-    <label>Étirer verticalement <input id="img-stretch-y" type="range" min="50" max="200" value="100"><output id="img-stretch-y-value">100 %</output></label>
-  </div>
-  <p class="aide">Glissez l’image pour la positionner · molette ou pincement pour zoomer · le cadre correspond à l’image finale.</p>
-
-  <div class="fiche">
-    <h2>Fiche Mémo</h2>
-    <div class="champs">
-      <label>Numéro<input id="f-number"></label>
-      <label class="large">Nom / réponse<input id="f-name"></label>
-      <label class="large">Titre<input id="f-title"></label>
-      <label class="large">Sous-titre<input id="f-subtitle"></label>
-      <label class="large">Description<textarea id="f-description"></textarea></label>
-      <label class="large">Texte complémentaire<textarea id="f-extra"></textarea></label>
-      <label class="large">Lien Wikipédia<input id="f-wiki" type="url"></label>
-      <label>Statut<select id="f-status"></select></label>
-      <label class="check"><input id="f-locked" type="checkbox"> Image verrouillée</label>
-      <div id="dynamic-fields" class="dynamic-fields"></div>
-    </div>
-    <div class="fiche-actions">
-      <button id="duplicate-row" class="btn">Dupliquer</button>
-      <button id="entry-note" class="btn">📝 Note</button>
-      <button id="trash-row" class="btn danger">🗑 Supprimer</button>
+    <div class="ed-actions">
+      <button class="btn" id="ed-remplacer">🔄 Remplacer l'image…</button>
+      <button class="btn" id="ed-note">📝 Note…</button>
+      <output id="ed-mesures" class="doux"></output>
     </div>
   </div>
-</section>
+  <p class="ed-aide">Glisse la photo pour la positionner · molette ou pincement
+  pour zoomer · le cadre = ce que Mémo affichera. La miniature est découpée dans
+  le même cadrage : les deux ne peuvent pas diverger.</p>
 
-<dialog id="notes-dialog">
-  <div class="dialog-head"><b>Notes éditoriales</b><button data-close>×</button></div>
-  <div id="notes-list"></div>
-  <textarea id="note-text" placeholder="Nouvelle note…"></textarea>
-  <div class="dialog-actions">
-    <select id="note-status"><option value="todo">À faire</option><option value="doing">En cours</option><option value="done">Terminée</option></select>
-    <select id="note-priority"><option>normale</option><option>haute</option><option>basse</option></select>
-    <button id="note-add" class="btn primaire">Ajouter</button>
+  <div class="ed-fiche">
+    <h4>Fiche de l'entrée</h4>
+    <div class="ed-grille-champs">
+      <label>Numéro <input id="ed-f-numero"></label>
+      <label>Nom / réponse <input id="ed-f-nom"></label>
+      <label>Titre <input id="ed-f-titre"></label>
+      <label>Sous-titre <input id="ed-f-soustitre"></label>
+    </div>
+    <label>Lien Wikipédia
+      <span class="rangee"><input id="ed-f-wiki" type="url"><a class="btn btn-discret" id="ed-f-wiki-ouvrir" target="_blank" rel="noreferrer">Ouvrir</a></span></label>
+    <label>Description <textarea id="ed-f-description"></textarea></label>
+    <div class="ed-grille-champs">
+      <label>Statut de l'image <select id="ed-f-statut"></select></label>
+      <label class="case"><input id="ed-f-verrou" type="checkbox"> Image verrouillée</label>
+    </div>
+    <div id="ed-champs-liste"></div>
   </div>
-</dialog>
+  <input type="file" id="ed-fichier" accept="image/*" hidden>
+</div>
 
-<dialog id="github-dialog">
-  <div class="dialog-head"><b>Connexion GitHub</b><button data-close>×</button></div>
-  <p>Le jeton autorisé à modifier <code>Blinytz/memo-web</code> reste uniquement dans cet onglet.</p>
-  <label>Jeton<input id="github-token" type="password" autocomplete="off"></label>
-  <button id="github-connect" class="btn primaire">Vérifier et utiliser</button>
-</dialog>
+<div id="modale" class="modale" hidden><div class="modale-boite" id="modale-boite"></div></div>
 
-<script type="module" src="atelier/app.js?v=20260728-3"></script>
+<script type="module" src="atelier/app.js?v=20260802"></script>
 </body>
 </html>
