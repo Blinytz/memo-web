@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "revision": 44,
-  "updatedAt": "2026-08-02T20:35:50.926Z",
+  "revision": 45,
+  "updatedAt": "2026-08-02T20:36:11.142Z",
   "imageFormat": {
     "ratio": 1.3333333333333333,
     "full": [
@@ -1955,15 +1955,15 @@
         "full": "full/chefs_etat/30.webp",
         "thumb": "thumbs/chefs_etat/30.webp",
         "crop": {
-          "cx": 0.5417785508534142,
-          "cy": 0.46729931409596237,
-          "w": 0.6761833208114197
+          "cx": 0.49999999999999994,
+          "cy": 0.33656208217144007,
+          "w": 0.9999999999999999
         },
         "status": "validee",
         "locked": false,
         "provenance": {
           "kind": "manuel",
-          "at": "2026-08-02T20:29:14.352Z"
+          "at": "2026-08-02T20:36:10.161Z"
         }
       }
     },
