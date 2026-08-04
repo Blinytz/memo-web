@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "revision": 175,
-  "updatedAt": "2026-08-04T19:36:17.929Z",
+  "revision": 176,
+  "updatedAt": "2026-08-04T19:36:46.598Z",
   "imageFormat": {
     "ratio": 1.3333333333333333,
     "full": [
@@ -27392,19 +27392,19 @@
       "deletedAt": null,
       "externalIds": {},
       "image": {
-        "source": "full/peintres/2.webp",
+        "source": "originaux/peintres/2.webp",
         "full": "full/peintres/2.webp",
         "thumb": "thumbs/peintres/2.webp",
         "crop": {
           "cx": 0.5,
-          "cy": 0.5,
+          "cy": 0.42201415261355313,
           "w": 1
         },
-        "status": "a_verifier",
+        "status": "validee",
         "locked": false,
         "provenance": {
-          "kind": "legacy",
-          "value": "thumbs/peintres/2.webp"
+          "kind": "manuel",
+          "at": "2026-08-04T19:36:45.837Z"
         }
       }
     },
