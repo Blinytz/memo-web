@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "revision": 179,
-  "updatedAt": "2026-08-04T19:38:27.378Z",
+  "revision": 180,
+  "updatedAt": "2026-08-04T19:38:39.908Z",
   "imageFormat": {
     "ratio": 1.3333333333333333,
     "full": [
@@ -39467,7 +39467,7 @@
       "deletedAt": null,
       "externalIds": {},
       "image": {
-        "source": "full/litterature/2.webp",
+        "source": "originaux/litterature/2.webp",
         "full": "full/litterature/2.webp",
         "thumb": "thumbs/litterature/2.webp",
         "crop": {
@@ -39475,11 +39475,11 @@
           "cy": 0.5,
           "w": 1
         },
-        "status": "a_verifier",
+        "status": "validee",
         "locked": false,
         "provenance": {
-          "kind": "legacy",
-          "value": "thumbs/litterature/2.webp"
+          "kind": "manuel",
+          "at": "2026-08-04T19:38:39.028Z"
         }
       }
     },
