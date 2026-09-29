@@ -1,129 +1,32 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#12121c">
-<title>Atelier Mémo</title>
-<link rel="icon" href="icon-192.png">
-<link rel="stylesheet" href="atelier/style.css?v=20260802h">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mémo a déménagé</title>
+  <meta http-equiv="refresh" content="0; url=https://blinytz.github.io/memo/atelier.html">
+  <link rel="canonical" href="https://blinytz.github.io/memo/atelier.html">
+  <style>
+    body { margin: 0; min-height: 100vh; display: grid; place-items: center;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      background: #F1F0FB; color: #1B1735; padding: 24px; text-align: center; }
+    .carte { max-width: 30rem; background: #fff; border-radius: 18px; padding: 32px 28px;
+      box-shadow: 0 8px 32px rgba(27, 23, 53, 0.1); }
+    h1 { font-size: 1.4rem; margin: 0 0 12px; }
+    p { color: #5B5580; line-height: 1.5; margin: 0 0 20px; }
+    a.btn { display: inline-block; background: #4EA8FF; color: #fff; text-decoration: none;
+      font-weight: 600; padding: 12px 22px; border-radius: 12px; }
+  </style>
 </head>
 <body>
-
-<header id="entete">
-  <div class="titre">🖼️ Atelier <span>Mémo</span></div>
-  <div id="badge-envoi" class="badge-envoi" hidden></div>
-  <nav id="onglets">
-    <button data-vue="grille" class="actif">Grille</button>
-    <button data-vue="tableau">Tableau</button>
-    <button data-vue="notes">Notes <span id="nb-notes"></span></button>
-    <button data-vue="config">⚙</button>
-  </nav>
-  <button class="btn" id="btn-annuler" title="Annuler">↶</button>
-  <button class="btn" id="btn-refaire" title="Refaire">↷</button>
-  <button class="btn btn-primaire" id="btn-enregistrer">💾 Enregistrer</button>
-  <output id="etat">Chargement…</output>
-</header>
-
-<div id="barre-filtres" class="barre-filtres">
-  <select id="f-liste"><option value="">Toutes les listes</option></select>
-  <select id="f-statut">
-    <option value="">Tous les statuts</option>
-    <option value="sans">🚫 sans image</option>
-    <option value="a_verifier">⚠ à vérifier</option>
-    <option value="validee">✓ validée</option>
-    <option value="importee">⬇ importée</option>
-    <option value="verrouillee">🔒 verrouillée</option>
-  </select>
-  <input type="search" id="f-texte" placeholder="🔍 nom d'entrée…">
-  <button class="btn" id="btn-nouvelle">➕ Nouvelle entrée</button>
-</div>
-
-<main>
-  <section id="vue-grille" class="vue visible"><p class="doux">Chargement…</p></section>
-
-  <section id="vue-tableau" class="vue">
-    <div class="barre-outils">
-      <b id="tableau-titre">Liste</b>
-      <span id="tableau-metriques" class="doux"></span>
-      <button class="btn" id="btn-ligne">＋ Ligne</button>
-      <button class="btn" id="btn-dupliquer">Dupliquer</button>
-      <button class="btn" id="btn-corbeille">Corbeille</button>
-      <button class="btn" id="btn-renumeroter">Renuméroter</button>
-    </div>
-    <div class="tableau-defile"><table><thead id="thead"></thead><tbody id="tbody"></tbody></table></div>
-  </section>
-
-  <section id="vue-notes" class="vue"></section>
-  <section id="vue-config" class="vue"></section>
-</main>
-
-<!-- ---------- éditeur ---------- -->
-<div id="editeur" class="editeur" hidden>
-  <div class="editeur-entete">
-    <button class="btn btn-discret" id="ed-fermer">✕ Fermer</button>
-    <button class="btn nav-card" id="ed-precedent" title="Entrée précédente">←</button>
-    <div class="ed-titre">
-      <span class="ed-nom-rangee">
-        <b id="ed-nom"></b>
-        <button id="ed-copier" class="btn-copier" title="Copier le nom pour le chercher dans un navigateur">📋</button>
-      </span>
-      <small id="ed-infos"></small>
-    </div>
-    <button class="btn nav-card" id="ed-suivant" title="Entrée suivante">→</button>
-    <button class="btn btn-primaire" id="ed-enregistrer">💾 Enregistrer l'image</button>
+  <div class="carte">
+    <h1>Mémo a déménagé</h1>
+    <p>Mémo vit désormais à une seule adresse, mise à jour automatiquement.
+      Tes listes et tes scores sont conservés : ils restent dans ce navigateur.</p>
+    <p>Si tu avais installé Mémo depuis ici, supprime ce raccourci et
+      réinstalle depuis la nouvelle adresse.</p>
+    <a class="btn" href="https://blinytz.github.io/memo/atelier.html">Ouvrir Mémo</a>
   </div>
-
-  <div class="editeur-scene">
-    <div class="ed-cadre-conteneur" id="ed-conteneur">
-      <div id="ed-vide">Aucune image — colle une URL, une image (Ctrl+V) ou choisis un fichier.</div>
-      <img id="ed-image" alt="" draggable="false">
-      <div class="ed-cadre"></div>
-    </div>
-  </div>
-
-  <div class="editeur-outils">
-    <div class="ed-zoom">
-      <button class="btn" id="ed-moins">−</button>
-      <button class="btn" id="ed-plus">+</button>
-      <button class="btn btn-discret" id="ed-reset">↺ recadrer auto</button>
-    </div>
-    <div class="ed-apercu">
-      <span>Miniature de Mémo <small>400 × 300</small></span>
-      <canvas id="ed-canvas-apercu" width="400" height="300"></canvas>
-    </div>
-    <div class="ed-actions">
-      <button class="btn" id="ed-remplacer">🔄 Remplacer l'image…</button>
-      <button class="btn" id="ed-note">📝 Note…</button>
-      <output id="ed-mesures" class="doux"></output>
-    </div>
-  </div>
-  <p class="ed-aide">Glisse la photo pour la positionner · molette ou pincement
-  pour zoomer · le cadre = ce que Mémo affichera. La miniature est découpée dans
-  le même cadrage : les deux ne peuvent pas diverger.</p>
-
-  <div class="ed-fiche">
-    <h4>Fiche de l'entrée</h4>
-    <div class="ed-grille-champs">
-      <label>Numéro <input id="ed-f-numero"></label>
-      <label>Nom / réponse <input id="ed-f-nom"></label>
-      <label>Titre <input id="ed-f-titre"></label>
-      <label>Sous-titre <input id="ed-f-soustitre"></label>
-    </div>
-    <label>Lien Wikipédia
-      <span class="rangee"><input id="ed-f-wiki" type="url"><a class="btn btn-discret" id="ed-f-wiki-ouvrir" target="_blank" rel="noreferrer">Ouvrir</a></span></label>
-    <label>Description <textarea id="ed-f-description"></textarea></label>
-    <div class="ed-grille-champs">
-      <label>Statut de l'image <select id="ed-f-statut"></select></label>
-      <label class="case"><input id="ed-f-verrou" type="checkbox"> Image verrouillée</label>
-    </div>
-    <div id="ed-champs-liste"></div>
-  </div>
-  <input type="file" id="ed-fichier" accept="image/*" hidden>
-</div>
-
-<div id="modale" class="modale" hidden><div class="modale-boite" id="modale-boite"></div></div>
-
-<script type="module" src="atelier/app.js?v=20260802h"></script>
+  <script>location.replace("https://blinytz.github.io/memo/atelier.html" + location.search + location.hash);</script>
 </body>
 </html>
