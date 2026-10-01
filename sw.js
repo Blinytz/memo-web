@@ -1,4 +1,4 @@
-// Cette adresse est retirée : Mémo vit à https://blinytz.github.io/memo/.
+// Cette adresse est retirée : Mnémo vit à https://blinytz.github.io/mnemo/.
 // Le service worker ne sert plus rien : il vide les caches de l'ancienne copie
 // (et seulement eux : le domaine est partagé avec les autres applications),
 // se désinscrit, puis recharge les fenêtres ouvertes vers la redirection.
